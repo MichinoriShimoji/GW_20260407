@@ -12,4 +12,11 @@ current/
 *.bst
 *.pptx
 *.png
+!ude.png
+!udj_p1_tokenization.png
+!udj_p2_feats.png
+!udj_p3_deprel.png
+!taguchi_code.png
+!taguchiandmine.png
+!udj_panel.png
 MUDJ_corrected (1).pdf
