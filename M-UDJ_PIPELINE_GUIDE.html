@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>M-UDJ Pipeline 解説</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#faf9f6;--bg2:#f0eee8;--bg3:#e6e3db;--fg:#1a1917;--fg2:#4a4840;--fg3:#8a8878;--bd:#d4d1c6;--acc:#b8860b;--acc2:#8b6914;--red:#c0392b;--grn:#27834a;--blu:#2563a8;--pur:#7b3fa0}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:'IBM Plex Sans','Noto Sans JP',system-ui,sans-serif;font-size:15px;line-height:1.7}
+.wrap{max-width:900px;margin:0 auto;padding:24px 20px 80px}
+h1{font-size:28px;font-weight:700;color:var(--acc2);border-bottom:3px solid var(--acc);padding-bottom:12px;margin-bottom:8px}
+h1 span{font-weight:300;font-size:16px;color:var(--fg3);display:block;margin-top:4px}
+h2{font-size:20px;font-weight:600;color:var(--fg);margin:40px 0 16px;padding:8px 0;border-bottom:1px solid var(--bd)}
+h2 .num{display:inline-block;background:var(--acc);color:#fff;width:28px;height:28px;line-height:28px;text-align:center;border-radius:50%;font-size:14px;margin-right:8px;vertical-align:middle}
+h3{font-size:16px;font-weight:600;color:var(--fg2);margin:24px 0 10px}
+p{margin:8px 0;color:var(--fg2)}
+.lead{font-size:16px;color:var(--fg);line-height:1.8;margin:16px 0 24px}
+
+/* Cards */
+.card{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:20px;margin:16px 0;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.card-title{font-weight:600;font-size:14px;color:var(--acc2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+
+/* Code */
+pre{background:#1e1e1e;color:#d4d4d4;padding:16px 20px;border-radius:8px;overflow-x:auto;font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.6;margin:12px 0}
+code{font-family:'IBM Plex Mono',monospace;font-size:13px;background:var(--bg2);padding:1px 5px;border-radius:3px}
+pre code{background:none;padding:0}
+.hl-r{color:#f48771}
+.hl-g{color:#6a9955}
+.hl-b{color:#569cd6}
+.hl-y{color:#dcdcaa}
+.hl-o{color:#ce9178}
+.hl-p{color:#c586c0}
+.hl-w{color:#d4d4d4}
+.hl-dim{color:#6a6a6a}
+
+/* Tables */
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+th{background:var(--bg2);font-weight:600;text-align:left;padding:8px 12px;border:1px solid var(--bd);color:var(--fg2);font-size:13px}
+td{padding:8px 12px;border:1px solid var(--bd);vertical-align:top}
+tr:nth-child(even){background:rgba(0,0,0,.015)}
+
+/* Diagram containers */
+.diagram{margin:20px 0;overflow-x:auto}
+.diagram svg{display:block;margin:0 auto}
+
+/* Phase boxes */
+.phase{display:flex;gap:12px;align-items:stretch;margin:16px 0;flex-wrap:wrap}
+.phase-box{flex:1;min-width:180px;background:#fff;border:1px solid var(--bd);border-radius:8px;padding:14px;border-left:4px solid var(--acc)}
+.phase-box.chain{border-left-color:var(--grn)}
+.phase-box.affix{border-left-color:var(--red)}
+.phase-box.sconj{border-left-color:var(--pur)}
+.phase-box.phon{border-left-color:var(--blu)}
+.phase-box .label{font-weight:600;font-size:13px;margin-bottom:6px}
+.phase-box .desc{font-size:12px;color:var(--fg3);line-height:1.5}
+.phase-box .count{font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:700;color:var(--acc2)}
+
+/* Example blocks */
+.ex{background:var(--bg2);border-radius:8px;padding:16px;margin:12px 0;font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.8}
+.ex .arrow{color:var(--acc);font-weight:700;margin:0 8px}
+.ex .from{color:var(--red)}
+.ex .to{color:var(--grn)}
+.ex .tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:11px;font-weight:500}
+.ex .tag-chain{background:rgba(39,131,74,.1);color:var(--grn)}
+.ex .tag-affix{background:rgba(192,57,43,.1);color:var(--red)}
+.ex .tag-feat{background:rgba(37,99,168,.1);color:var(--blu)}
+
+/* Token display */
+.tok-grid{display:grid;grid-template-columns:40px 1fr 1fr 60px 80px 1fr 1fr;gap:1px;font-family:'IBM Plex Mono',monospace;font-size:12px;margin:12px 0;background:var(--bd);border-radius:6px;overflow:hidden}
+.tok-grid .hdr{background:var(--bg3);font-weight:600;padding:6px 8px;color:var(--fg2)}
+.tok-grid .cell{background:#fff;padding:5px 8px}
+.tok-grid .cell.changed{background:#fef9e7;font-weight:500}
+.tok-grid .cell.merged{background:#eafaf1;font-weight:500;color:var(--grn)}
+
+/* Stats bar */
+.stats{display:flex;gap:16px;flex-wrap:wrap;margin:16px 0}
+.stat{text-align:center;flex:1;min-width:120px;background:#fff;border:1px solid var(--bd);border-radius:8px;padding:14px 10px}
+.stat .val{font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:700;color:var(--acc2)}
+.stat .lbl{font-size:12px;color:var(--fg3);margin-top:4px}
+
+/* File list */
+.flist{list-style:none;margin:12px 0}
+.flist li{padding:6px 0;border-bottom:1px solid rgba(0,0,0,.05);display:flex;align-items:baseline;gap:10px}
+.flist .fname{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;color:var(--blu);min-width:220px}
+.flist .fdesc{font-size:13px;color:var(--fg3)}
+
+@media(max-width:600px){.phase{flex-direction:column}.stats{flex-direction:column}.tok-grid{font-size:11px;grid-template-columns:30px repeat(6,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>M-UDJ Pipeline<span>GSD (仮名) → M-UDJ (phonemic alphabet) 変換パイプライン</span></h1>
+
+<p class="lead">日本語 Universal Dependencies コーパス (GSD) の仮名表記・不適切な形態素分割・feats不足を、ユーザー定義の187パターンに基づいて体系的に修正し、phonemic alphabet ベースの新コーパス <strong>M-UDJ</strong> を生成する。</p>
+
+<!-- ===== OVERVIEW DIAGRAM ===== -->
+<h2><span class="num">1</span>全体像</h2>
+
+<div class="diagram">
+<svg viewBox="0 0 860 520" style="max-width:860px" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="ah" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#b8860b"/></marker>
+    <marker id="ah-g" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#27834a"/></marker>
+    <marker id="ah-r" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#c0392b"/></marker>
+    <filter id="shadow"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity=".08"/></filter>
+  </defs>
+
+  <!-- ===== LEFT: Teacher Data ===== -->
+  <rect x="10" y="10" width="230" height="260" rx="10" fill="#fef9e7" stroke="#daa520" stroke-width="1.5" stroke-dasharray="6"/>
+  <text x="125" y="32" text-anchor="middle" font-size="12" font-weight="700" fill="#8b6914">教師データ (User)</text>
+
+  <!-- v2 tool -->
+  <rect x="25" y="48" width="200" height="44" rx="7" fill="#fff" stroke="#b8860b" filter="url(#shadow)"/>
+  <text x="125" y="66" text-anchor="middle" font-size="12" font-weight="600" fill="#8b6914">UDJ_v2.html</text>
+  <text x="125" y="82" text-anchor="middle" font-size="10" fill="#8a8878">パターンアノテーション</text>
+
+  <!-- arrow -->
+  <line x1="125" y1="92" x2="125" y2="108" stroke="#b8860b" stroke-width="1.5" marker-end="url(#ah)"/>
+
+  <!-- v2 JSON -->
+  <rect x="25" y="110" width="200" height="44" rx="7" fill="#fff" stroke="#daa520" filter="url(#shadow)"/>
+  <text x="125" y="128" text-anchor="middle" font-size="12" font-weight="600" fill="#4a4840">udj_v2_annotations.json</text>
+  <text x="125" y="144" text-anchor="middle" font-size="10" fill="#8a8878">187 patterns</text>
+
+  <!-- affix editor -->
+  <rect x="25" y="170" width="200" height="44" rx="7" fill="#fff" stroke="#c0392b" filter="url(#shadow)"/>
+  <text x="125" y="188" text-anchor="middle" font-size="12" font-weight="600" fill="#c0392b">affix_editor.html</text>
+  <text x="125" y="204" text-anchor="middle" font-size="10" fill="#8a8878">Affix定義・Token境界ルール</text>
+
+  <!-- arrow -->
+  <line x1="125" y1="214" x2="125" y2="230" stroke="#c0392b" stroke-width="1.5" marker-end="url(#ah-r)"/>
+
+  <!-- affix rules JSON -->
+  <rect x="25" y="232" width="200" height="30" rx="6" fill="#f8d7da" stroke="#c0392b"/>
+  <text x="125" y="252" text-anchor="middle" font-size="11" font-weight="500" fill="#c0392b">affix_rules.json</text>
+
+  <!-- ===== CENTER-RIGHT: Pipeline ===== -->
+  <!-- Input -->
+  <rect x="270" y="50" width="160" height="56" rx="8" fill="#fff" stroke="#d4d1c6" filter="url(#shadow)"/>
+  <text x="350" y="73" text-anchor="middle" font-size="13" font-weight="600" fill="#1a1917">GSD .conllu</text>
+  <text x="350" y="90" text-anchor="middle" font-size="10" fill="#8a8878">仮名表記 / 193,654 tok</text>
+
+  <!-- decisions_full.json -->
+  <rect x="270" y="290" width="160" height="48" rx="7" fill="#fef9e7" stroke="#daa520" filter="url(#shadow)"/>
+  <text x="350" y="310" text-anchor="middle" font-size="11" font-weight="600" fill="#8b6914">decisions_full.json</text>
+  <text x="350" y="326" text-anchor="middle" font-size="9" fill="#8a8878">chain / affix / gloss_map</text>
+
+  <!-- Arrows from teacher data to decisions -->
+  <line x1="225" y1="132" x2="270" y2="305" stroke="#daa520" stroke-width="1.5" stroke-dasharray="5" marker-end="url(#ah)"/>
+  <line x1="225" y1="247" x2="270" y2="312" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="5" marker-end="url(#ah-r)"/>
+
+  <!-- Arrow: GSD → pipeline -->
+  <line x1="350" y1="106" x2="350" y2="138" stroke="#b8860b" stroke-width="2" marker-end="url(#ah)"/>
+
+  <!-- Pipeline box -->
+  <rect x="460" y="130" width="250" height="360" rx="10" fill="#f7f5f0" stroke="#b8860b" stroke-width="2"/>
+  <text x="585" y="152" text-anchor="middle" font-size="12" font-weight="700" fill="#8b6914">new_pipeline.py</text>
+
+  <!-- Arrow: decisions → pipeline -->
+  <line x1="430" y1="314" x2="460" y2="280" stroke="#daa520" stroke-width="1.5" stroke-dasharray="4" marker-end="url(#ah)"/>
+  <!-- Arrow: GSD → pipeline -->
+  <line x1="420" y1="78" x2="460" y2="170" stroke="#b8860b" stroke-width="1.5" marker-end="url(#ah)"/>
+
+  <!-- Phase 0 -->
+  <rect x="478" y="164" width="214" height="32" rx="5" fill="#fff3cd" stroke="#daa520"/>
+  <text x="496" y="185" font-size="11" font-weight="600" fill="#8b6914">P0</text>
+  <text x="530" y="185" font-size="10" fill="#4a4840">MWT展開 (じゃ→で+は)</text>
+
+  <!-- Phase 1 -->
+  <rect x="478" y="202" width="214" height="32" rx="5" fill="#d4edda" stroke="#27834a"/>
+  <text x="496" y="223" font-size="11" font-weight="600" fill="#27834a">P1</text>
+  <text x="530" y="223" font-size="10" fill="#4a4840">Chain (ている→2tok, ので→1)</text>
+
+  <!-- Phase 2a -->
+  <rect x="478" y="240" width="214" height="32" rx="5" fill="#f8d7da" stroke="#c0392b"/>
+  <text x="496" y="261" font-size="11" font-weight="600" fill="#c0392b">P2a</text>
+  <text x="534" y="261" font-size="10" fill="#4a4840">Affix統合 (た,ない,ます…)</text>
+
+  <!-- Phase 2b -->
+  <rect x="478" y="278" width="214" height="32" rx="5" fill="#e8daef" stroke="#7b3fa0"/>
+  <text x="496" y="299" font-size="11" font-weight="600" fill="#7b3fa0">P2b</text>
+  <text x="534" y="299" font-size="10" fill="#4a4840">SCONJ suffix (て→-te)</text>
+
+  <!-- Phase 3a -->
+  <rect x="478" y="320" width="214" height="32" rx="5" fill="#d6eaf8" stroke="#2563a8"/>
+  <text x="496" y="341" font-size="11" font-weight="600" fill="#2563a8">P3a</text>
+  <text x="534" y="341" font-size="10" fill="#4a4840">UPOS/DepRel修正</text>
+
+  <!-- Phase 3b -->
+  <rect x="478" y="358" width="214" height="40" rx="5" fill="#d6eaf8" stroke="#2563a8"/>
+  <text x="496" y="377" font-size="11" font-weight="600" fill="#2563a8">P3b</text>
+  <text x="534" y="373" font-size="10" fill="#4a4840">FORM/LEMMA → phonemic</text>
+  <text x="534" y="389" font-size="10" fill="#4a4840">Feats + MorphGloss</text>
+
+  <!-- Phase 3c -->
+  <rect x="478" y="404" width="214" height="32" rx="5" fill="#d6eaf8" stroke="#2563a8"/>
+  <text x="496" y="425" font-size="11" font-weight="600" fill="#2563a8">P3c</text>
+  <text x="534" y="425" font-size="10" fill="#4a4840">構造override (である等)</text>
+
+  <!-- Output arrow -->
+  <line x1="585" y1="450" x2="585" y2="480" stroke="#27834a" stroke-width="2" marker-end="url(#ah-g)"/>
+
+  <!-- Output -->
+  <rect x="505" y="482" width="160" height="30" rx="7" fill="#eafaf1" stroke="#27834a" stroke-width="2"/>
+  <text x="585" y="502" text-anchor="middle" font-size="13" font-weight="700" fill="#27834a">M-UDJ .conllu</text>
+
+  <!-- Backward -->
+  <rect x="270" y="370" width="160" height="40" rx="7" fill="#f0eee8" stroke="#d4d1c6" filter="url(#shadow)"/>
+  <text x="350" y="387" text-anchor="middle" font-size="11" font-weight="500" fill="#4a4840">backward_retokenizer</text>
+  <text x="350" y="402" text-anchor="middle" font-size="9" fill="#8a8878">M-UDJ → GSD復元</text>
+  <line x1="430" y1="390" x2="505" y2="497" stroke="#d4d1c6" stroke-width="1" stroke-dasharray="4"/>
+
+  <!-- mudj_editor -->
+  <rect x="270" y="440" width="160" height="40" rx="7" fill="#fff" stroke="#2563a8" filter="url(#shadow)"/>
+  <text x="350" y="457" text-anchor="middle" font-size="11" font-weight="500" fill="#2563a8">mudj_editor.html</text>
+  <text x="350" y="472" text-anchor="middle" font-size="9" fill="#8a8878">出力閲覧・手動修正</text>
+  <line x1="430" y1="460" x2="505" y2="497" stroke="#2563a8" stroke-width="1" stroke-dasharray="4"/>
+</svg>
+</div>
+
+<!-- ===== TEACHER DATA ===== -->
+<h2><span class="num">2</span>教師データのワークフロー</h2>
+
+<p class="lead">パイプラインの変換ルールは、ユーザーが2つのHTMLツールで定義し、JSONとして書き出す。パイプラインはこのJSONを読み込んで自動適用する。</p>
+
+<div class="card">
+<div class="card-title">① UDJ_v2.html — パターンアノテーション</div>
+<p>日本語文法の187パターンをバッチごとに表示し、各パターンに以下を記入する：</p>
+<table>
+<tr><th>フィールド</th><th>内容</th><th>例 (ている)</th></tr>
+<tr><td><code>phon</code></td><td>phonemic表記（トークン分割はスペース）</td><td><span style="color:var(--blu);font-weight:500">tabe-te i-ru</span></td></tr>
+<tr><td><code>gloss</code></td><td>Leipzig gloss（-で形態素境界）</td><td><span style="color:var(--red);font-weight:500">食べる-SEQ PROG-PRS</span></td></tr>
+<tr><td><code>ov</code></td><td>各トークンのUPOS/deprel/feats override</td><td>tok1: {upos:AUX, head:1}</td></tr>
+</table>
+<div class="ex">
+出力: <code>udj_v2_annotations.json</code> → <code>v2_to_v5.py</code> → <code>decisions_full.json</code> に統合
+</div>
+</div>
+
+<div class="card">
+<div class="card-title">② affix_editor.html — Affix定義とトークン境界</div>
+<p>各接辞（た・ない・ます・れる等）について以下を定義する：</p>
+<table>
+<tr><th>タブ</th><th>編集内容</th></tr>
+<tr><td><b>Affix Definitions</b></td><td>各接辞の活用形ごとの phon / seg / gloss / feats（例: ta → PST, tara → CND）</td></tr>
+<tr><td><b>Stacking Patterns</b></td><td>接辞の積み重ねパターンとトークン分割の正解（例: V+CAUS+PASS+PST → <span style="color:var(--blu)">tabe-saserareta</span>）</td></tr>
+<tr><td><b>Token Boundaries</b></td><td>各接辞の後でトークンが切れるか（例: -te → ✂yes, jd.ta → →no）</td></tr>
+</table>
+<div class="ex">
+出力: <code>affix_rules.json</code> → パイプラインの Phase 2a が読み込む
+</div>
+</div>
+
+<div class="card">
+<div class="card-title">③ mudj_editor.html — 出力精査</div>
+<p>パイプライン出力の M-UDJ CoNLL-U を閲覧し、依存構造図を確認しながら手動修正する。ExtPOS編集にも対応。</p>
+</div>
+
+<!-- ===== PROBLEM ===== -->
+<h2><span class="num">3</span>GSDの問題と解決</h2>
+
+<div class="card">
+<div class="card-title">問題: 「反則があるので」の GSD表現</div>
+<div class="tok-grid">
+  <div class="hdr">ID</div><div class="hdr">FORM</div><div class="hdr">LEMMA</div><div class="hdr">UPOS</div><div class="hdr">DepRel</div><div class="hdr">Feats</div><div class="hdr">問題</div>
+  <div class="cell">7</div><div class="cell">反則</div><div class="cell">反則</div><div class="cell">NOUN</div><div class="cell">nsubj</div><div class="cell">_</div><div class="cell">仮名表記</div>
+  <div class="cell">8</div><div class="cell">が</div><div class="cell">が</div><div class="cell">ADP</div><div class="cell">case</div><div class="cell">_</div><div class="cell" style="color:var(--red)">Case=Nom なし</div>
+  <div class="cell">9</div><div class="cell">ある</div><div class="cell">有る</div><div class="cell">VERB</div><div class="cell">advcl</div><div class="cell">_</div><div class="cell" style="color:var(--red)">Tense=Pres なし</div>
+  <div class="cell">10</div><div class="cell">の</div><div class="cell">の</div><div class="cell">SCONJ</div><div class="cell">mark</div><div class="cell">_</div><div class="cell" style="color:var(--red)">「ので」が2トークン</div>
+  <div class="cell">11</div><div class="cell">で</div><div class="cell">だ</div><div class="cell">AUX</div><div class="cell">fixed</div><div class="cell">_</div><div class="cell" style="color:var(--red)">↑ ので の一部</div>
+</div>
+</div>
+
+<div class="card">
+<div class="card-title">解決後: M-UDJ</div>
+<div class="tok-grid">
+  <div class="hdr">ID</div><div class="hdr">FORM</div><div class="hdr">LEMMA</div><div class="hdr">UPOS</div><div class="hdr">DepRel</div><div class="hdr">Feats</div><div class="hdr">Gloss</div>
+  <div class="cell changed">7</div><div class="cell changed">haNsoku</div><div class="cell changed">haNsoku</div><div class="cell">NOUN</div><div class="cell">nsubj</div><div class="cell">_</div><div class="cell">—</div>
+  <div class="cell changed">8</div><div class="cell changed">ga</div><div class="cell changed">ga</div><div class="cell">ADP</div><div class="cell">case</div><div class="cell changed">Case=Nom</div><div class="cell changed">NOM</div>
+  <div class="cell changed">9</div><div class="cell changed">ar-u</div><div class="cell changed">ar-u</div><div class="cell">VERB</div><div class="cell">advcl</div><div class="cell changed">Tense=Pres</div><div class="cell">—</div>
+  <div class="cell merged">10</div><div class="cell merged">no+de</div><div class="cell merged">no+da</div><div class="cell">SCONJ</div><div class="cell">mark</div><div class="cell">_</div><div class="cell merged">CAUS.SEQ</div>
+</div>
+</div>
+
+<!-- ===== PHASES ===== -->
+<h2><span class="num">4</span>各フェーズの詳細</h2>
+
+<h3>Phase 0: MWT展開</h3>
+<p>口語の縮約形を分析的な形に展開する（CoNLL-U Multiword Token形式）。</p>
+<div class="ex">
+<span class="from">じゃ</span> <span class="arrow">→</span> <span class="to">で + は</span> &nbsp; <span class="tag tag-feat">zya → de + wa</span><br>
+<span class="from">ちゃう</span> <span class="arrow">→</span> <span class="to">て + しまう</span> &nbsp; <span class="tag tag-feat">tyau → te + simau</span>
+</div>
+
+<h3>Phase 1: Chain統合</h3>
+<p>GSD で <code>fixed</code> 関係で連なっている機能語連鎖を統合する。<b>te_aspect系</b>（ている、てくる等）は<b>2トークン</b>（verb-te + AUX）、<b>compound系</b>（ので、について等）は<b>1トークン</b>に統合。</p>
+<div class="ex">
+<span class="tag tag-chain">te_aspect → 2tok</span><br>
+<span class="from">食べ + て + いる</span> <span class="arrow">→</span> <span class="to">tabe-te</span> + <span class="to">ir-u</span> &nbsp; <span class="tag tag-feat">VERB + AUX/aux</span><br>
+<span class="from">決め + て + い + た</span> <span class="arrow">→</span> <span class="to">kime-te</span> + <span class="to">i-ta</span> &nbsp; <span class="tag tag-feat">verb-te + AUX(PST)</span><br>
+<br>
+<span class="tag tag-chain">compound → 1tok</span><br>
+<span class="from">の + で</span> <span class="arrow">→</span> <span class="to">no+de</span> &nbsp; <span class="tag tag-chain">SCONJ/mark CAUS.SEQ</span><br>
+<span class="from">に + つい + て</span> <span class="arrow">→</span> <span class="to">ni+tui+te</span> &nbsp; <span class="tag tag-chain">ADP/case TOPIC</span><br>
+<span class="from">と + し + て</span> <span class="arrow">→</span> <span class="to">to+si+te</span> &nbsp; <span class="tag tag-chain">ADP/case ROLE</span>
+</div>
+
+<h3>Phase 2a: Affix統合</h3>
+<p>GSD で独立トークン扱いの接辞（「助動詞」）を、先行する動詞・形容詞に結合する。<code>affix_rules.json</code> の <code>seg</code> フィールドが形態素境界の真実源。</p>
+
+<div class="card">
+<div class="card-title">カナ → phonemic + seg 変換フロー（例: 叫ば + れ）</div>
+<pre><code><span class="hl-g">GSD入力:</span>  叫ば(VERB,五段バ行)  +  れ(AUX, lemma=れる)
+
+<span class="hl-b">Step 1  k2p():</span>          サケバ → <span class="hl-y">sakeba</span>,    レ → <span class="hl-y">re</span>
+<span class="hl-b">Step 2  stem_split():</span>   sakeba → <span class="hl-y">sakeb-a</span>    (五段バ行: 子音+活用母音)
+<span class="hl-b">Step 3  LEMMA_DEC:</span>      れる → <span class="hl-o">jd.reru</span>     (rule_table.lemma_dec)
+<span class="hl-b">Step 4  godan prepend:</span>  stem末尾<span class="hl-r">'a'</span> + 're' = <span class="hl-r">'are'</span>
+<span class="hl-b">Step 5  seg_lookup:</span>     jd.reru|are|godan → <span class="hl-g">seg='are'</span>  (<span class="hl-o">affix_rules.json</span>)
+<span class="hl-b">Step 6  vowel strip:</span>   sakeb-<span class="hl-r">a</span> → <span class="hl-y">sakeb</span>     (stem から connecting vowel を除去)
+<span class="hl-b">Step 7  join:</span>          sakeb + '-' + are = <span class="hl-g">sakeb-are</span>
+<span class="hl-b">Step 8  gloss/feats:</span>   <span class="hl-o">PASS</span> / Voice=Pass  (affix_rules.json)</code></pre>
+</div>
+
+<div class="ex">
+<span class="from">食べ + た</span> <span class="arrow">→</span> <span class="to">tabe-ta</span> &nbsp; <span class="tag tag-affix">Tense=Past</span> <span class="tag tag-feat">PST</span><br>
+<span class="from">叫ば + れ</span> <span class="arrow">→</span> <span class="to">sakeb-are</span> &nbsp; <span class="tag tag-affix">Voice=Pass</span> <span class="tag tag-feat">PASS</span><br>
+<span class="from">食べ + ます</span> <span class="arrow">→</span> <span class="to">tabe-mas-u</span> &nbsp; <span class="tag tag-affix">Polite=Form|Tense=Pres</span> <span class="tag tag-feat">POL-NPST</span><br>
+<span class="from">触れ + られ + なかっ + た</span> <span class="arrow">→</span> <span class="to">hure-rare-na-kaQta</span><br>
+&nbsp;&nbsp;&nbsp; <span class="tag tag-affix">Voice=Pass|Polarity=Neg|Tense=Past</span> <span class="tag tag-feat">PASS-NEG-PST</span><br>
+<br>
+<span style="color:var(--fg3)">※ サ変する（攻撃+し+て+くる）は affix merge <b>対象外</b>: Phase 1.5 で N(→VERB) + する(AUX) の2トークン構造に変換</span>
+</div>
+
+<h3>Phase 2b: SCONJ suffix統合</h3>
+<p>接続助詞の「て」「ば」を先行動詞に結合する（ただし chain の一部は除外）。</p>
+<div class="ex">
+<span class="from">思い切っ + て</span> <span class="arrow">→</span> <span class="to">omoikiQ-te</span> &nbsp; <span class="tag tag-affix">VerbForm=Conv</span> <span class="tag tag-feat">SEQ</span><br>
+<span class="from">叫ばれ + て</span> <span class="arrow">→</span> <span class="to">sakeb-are-te</span> &nbsp; <span class="tag tag-affix">Voice=Pass|VerbForm=Conv</span><br>
+<span style="color:var(--fg3)">※ <code>て+いる</code>, <code>て+しまう</code> 等はchain扱いのため結合しない</span>
+</div>
+
+<h3>Phase 3a: UPOS/DepRel修正</h3>
+<p>ユーザーのJSON定義に基づき、GSD のラベルをUD標準に修正する。</p>
+<table>
+<tr><th>形式</th><th>GSD</th><th>→ M-UDJ</th><th>件数 (train)</th></tr>
+<tr><td><code>は</code></td><td>ADP / case</td><td style="color:var(--grn);font-weight:500">PART / advmod</td><td>4,665</td></tr>
+<tr><td><code>も</code></td><td>ADP / case</td><td style="color:var(--grn);font-weight:500">PART / advmod</td><td>1,454</td></tr>
+<tr><td><code>だけ, しか, ばかり</code> 等</td><td>ADP / case</td><td style="color:var(--grn);font-weight:500">PART / advmod</td><td>170</td></tr>
+<tr><td><code>よ, ね, か</code></td><td>PART / mark</td><td style="color:var(--grn);font-weight:500">PART / discourse</td><td>295</td></tr>
+<tr><td><code>ある</code> (である)</td><td>VERB / fixed</td><td style="color:var(--grn);font-weight:500">AUX / fixed</td><td>~650</td></tr>
+</table>
+
+<h3>Phase 3b: Phonemic変換 + Feats + Gloss</h3>
+
+<div class="diagram">
+<svg viewBox="0 0 780 190" style="max-width:780px" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="ah2" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#2563a8"/></marker></defs>
+  <!-- Step boxes -->
+  <rect x="10" y="20" width="130" height="55" rx="6" fill="#fff" stroke="#d4d1c6"/>
+  <text x="75" y="40" text-anchor="middle" font-size="10" font-weight="600" fill="#8a8878">UnidicInfo[4]</text>
+  <text x="75" y="56" text-anchor="middle" font-size="14" font-weight="500" fill="#1a1917">ハンソク</text>
+  <text x="75" y="70" text-anchor="middle" font-size="9" fill="#8a8878">表層形読み</text>
+  
+  <line x1="145" y1="47" x2="170" y2="47" stroke="#2563a8" stroke-width="1.5" marker-end="url(#ah2)"/>
+  
+  <rect x="175" y="20" width="110" height="55" rx="6" fill="#d6eaf8" stroke="#2563a8"/>
+  <text x="230" y="40" text-anchor="middle" font-size="10" font-weight="600" fill="#2563a8">k2p()</text>
+  <text x="230" y="58" text-anchor="middle" font-size="14" font-weight="600" fill="#1a1917">haNsoku</text>
+  
+  <line x1="290" y1="47" x2="315" y2="47" stroke="#2563a8" stroke-width="1.5" marker-end="url(#ah2)"/>
+  
+  <rect x="320" y="20" width="140" height="55" rx="6" fill="#d6eaf8" stroke="#2563a8"/>
+  <text x="390" y="40" text-anchor="middle" font-size="10" font-weight="600" fill="#2563a8">stem_split()</text>
+  <text x="390" y="58" text-anchor="middle" font-size="14" font-weight="600" fill="#1a1917">ar-u</text>
+  <text x="390" y="70" text-anchor="middle" font-size="9" fill="#8a8878">五段ラ行 → stem-ending</text>
+  
+  <line x1="465" y1="47" x2="490" y2="47" stroke="#2563a8" stroke-width="1.5" marker-end="url(#ah2)"/>
+  
+  <rect x="495" y="10" width="140" height="75" rx="6" fill="#eafaf1" stroke="#27834a"/>
+  <text x="565" y="30" text-anchor="middle" font-size="10" font-weight="600" fill="#27834a">FORM / LEMMA</text>
+  <text x="565" y="50" text-anchor="middle" font-size="14" font-weight="700" fill="#27834a">ar-u</text>
+  <text x="565" y="66" text-anchor="middle" font-size="11" fill="#27834a">Tense=Pres</text>
+  <text x="565" y="78" text-anchor="middle" font-size="9" fill="#8a8878">= FORM書き換え完了</text>
+  
+  <!-- Alias row -->
+  <rect x="10" y="110" width="130" height="55" rx="6" fill="#fff" stroke="#d4d1c6"/>
+  <text x="75" y="130" text-anchor="middle" font-size="10" font-weight="600" fill="#8a8878">surface form</text>
+  <text x="75" y="148" text-anchor="middle" font-size="14" font-weight="500" fill="#1a1917">は</text>
+  
+  <line x1="145" y1="137" x2="170" y2="137" stroke="#2563a8" stroke-width="1.5" marker-end="url(#ah2)"/>
+  
+  <rect x="175" y="110" width="110" height="55" rx="6" fill="#d6eaf8" stroke="#2563a8"/>
+  <text x="230" y="128" text-anchor="middle" font-size="10" font-weight="600" fill="#2563a8">k2p + alias</text>
+  <text x="230" y="148" text-anchor="middle" font-size="14" font-weight="600" fill="#1a1917">wa</text>
+  <text x="230" y="160" text-anchor="middle" font-size="9" fill="#8a8878">ha → wa</text>
+  
+  <line x1="290" y1="137" x2="315" y2="137" stroke="#2563a8" stroke-width="1.5" marker-end="url(#ah2)"/>
+  
+  <rect x="320" y="110" width="140" height="55" rx="6" fill="#d6eaf8" stroke="#2563a8"/>
+  <text x="390" y="128" text-anchor="middle" font-size="10" font-weight="600" fill="#2563a8">assign_gloss()</text>
+  <text x="390" y="148" text-anchor="middle" font-size="14" font-weight="600" fill="#b8860b">TOP</text>
+  <text x="390" y="160" text-anchor="middle" font-size="9" fill="#8a8878">PART/advmod → 主題</text>
+  
+  <line x1="465" y1="137" x2="490" y2="137" stroke="#2563a8" stroke-width="1.5" marker-end="url(#ah2)"/>
+  
+  <rect x="495" y="100" width="140" height="75" rx="6" fill="#eafaf1" stroke="#27834a"/>
+  <text x="565" y="118" text-anchor="middle" font-size="10" font-weight="600" fill="#27834a">FORM / Gloss</text>
+  <text x="565" y="140" text-anchor="middle" font-size="14" font-weight="700" fill="#27834a">wa</text>
+  <text x="565" y="156" text-anchor="middle" font-size="11" fill="#27834a">Case=Top</text>
+  <text x="565" y="168" text-anchor="middle" font-size="11" fill="#b8860b">TOP</text>
+</svg>
+</div>
+
+<!-- ===== NUMBERS ===== -->
+<h2><span class="num">5</span>数値</h2>
+
+<div class="stats">
+  <div class="stat"><div class="val">-8.5%</div><div class="lbl">トークン削減</div></div>
+  <div class="stat"><div class="val">100%</div><div class="lbl">Phonemic変換</div></div>
+  <div class="stat"><div class="val">35%</div><div class="lbl">Feats付与</div></div>
+  <div class="stat"><div class="val">49%</div><div class="lbl">MorphGloss</div></div>
+  <div class="stat"><div class="val">JSON駆動</div><div class="lbl">rule_table.json</div></div>
+</div>
+
+<table>
+<tr><th></th><th>GSD tok</th><th>GSD feats</th><th>M-UDJ tok</th><th>Gloss</th><th>Feats</th></tr>
+<tr><td><strong>train</strong></td><td>168,333</td><td>0.6%</td><td>154,108</td><td>48.9%</td><td>34.5%</td></tr>
+<tr><td><strong>dev</strong></td><td>12,287</td><td>0.4%</td><td>11,240</td><td>48.7%</td><td>34.7%</td></tr>
+<tr><td><strong>test</strong></td><td>13,034</td><td>0.8%</td><td>11,825</td><td>49.8%</td><td>36.0%</td></tr>
+</table>
+
+<!-- ===== EXAMPLE ===== -->
+<h2><span class="num">6</span>完全な変換例: train-s1</h2>
+
+<p style="font-size:16px;line-height:2">ホッケーにはデンジャラスプレーの反則があるので、膝より上にボールを浮かすことは基本的に反則になるが、その例外の一つがこのスクープである。</p>
+
+<pre><code><span class="hl-dim">ID</span> <span class="hl-b">FORM</span>             <span class="hl-p">LEMMA</span>        <span class="hl-y">UPOS</span>  <span class="hl-y">DEPREL</span>   <span class="hl-g">FEATS</span>             <span class="hl-o">GLOSS</span>
+ 1 <span class="hl-b">hoQkee</span>           <span class="hl-p">hoQkee</span>       <span class="hl-y">NOUN</span>  obl
+ 2 <span class="hl-b">ni</span>               <span class="hl-p">ni</span>           <span class="hl-y">ADP</span>   case      <span class="hl-g">Case=Dat</span>          <span class="hl-o">DAT</span>
+ 3 <span class="hl-b">wa</span>               <span class="hl-p">wa</span>           <span class="hl-y">PART</span>  advmod                      <span class="hl-o">TOP</span>
+ 4 <span class="hl-b">deNzyarasu</span>       <span class="hl-p">deNzyarasu</span>   <span class="hl-y">NOUN</span>  compound
+ 5 <span class="hl-b">puree</span>            <span class="hl-p">puree</span>        <span class="hl-y">NOUN</span>  nmod
+ 6 <span class="hl-b">no</span>               <span class="hl-p">no</span>           <span class="hl-y">ADP</span>   case      <span class="hl-g">Case=Gen</span>          <span class="hl-o">GEN</span>
+ 7 <span class="hl-b">haNsoku</span>          <span class="hl-p">haNsoku</span>      <span class="hl-y">NOUN</span>  nsubj
+ 8 <span class="hl-b">ga</span>               <span class="hl-p">ga</span>           <span class="hl-y">ADP</span>   case      <span class="hl-g">Case=Nom</span>          <span class="hl-o">NOM</span>
+ 9 <span class="hl-b">ar-u</span>             <span class="hl-p">ar-u</span>         <span class="hl-y">VERB</span>  advcl     <span class="hl-g">Tense=Pres</span>
+<span class="hl-r">★</span>10 <span class="hl-b">no+de</span>            <span class="hl-p">no+da</span>        <span class="hl-y">SCONJ</span> mark                      <span class="hl-o">CAUS.SEQ</span>
+11 <span class="hl-dim">、</span>
+18 <span class="hl-b">ukas-u</span>           <span class="hl-p">ukas-u</span>       <span class="hl-y">VERB</span>  acl       <span class="hl-g">Tense=Pres</span>
+19 <span class="hl-b">koto</span>             <span class="hl-p">koto</span>         <span class="hl-y">NOUN</span>  nsubj                       <span class="hl-o">FN</span>
+20 <span class="hl-b">wa</span>               <span class="hl-p">wa</span>           <span class="hl-y">PART</span>  advmod                      <span class="hl-o">TOP</span>
+23 <span class="hl-b">ni</span>               <span class="hl-p">da</span>           <span class="hl-y">AUX</span>   cop       <span class="hl-g">VerbForm=Conv</span>     <span class="hl-o">COP.INF</span>
+26 <span class="hl-b">nar-u</span>            <span class="hl-p">nar-u</span>        <span class="hl-y">VERB</span>  acl       <span class="hl-g">Tense=Pres</span>
+27 <span class="hl-b">ga</span>               <span class="hl-p">ga</span>           <span class="hl-y">SCONJ</span> mark      <span class="hl-g">Mood=Cnc</span>          <span class="hl-o">CNC</span>
+36 <span class="hl-b">sukuupu</span>          <span class="hl-p">sukuupu</span>      <span class="hl-y">NOUN</span>  root
+37 <span class="hl-b">de</span>               <span class="hl-p">da</span>           <span class="hl-y">AUX</span>   cop       <span class="hl-g">VerbForm=Conv</span>     <span class="hl-o">COP.SEQ</span>
+38 <span class="hl-b">ar-u</span>             <span class="hl-p">aru</span>          <span class="hl-y">AUX</span>   fixed     <span class="hl-g">Tense=Pres</span>        <span class="hl-o">COP.NPST</span></code></pre>
+
+<!-- ===== FILES ===== -->
+<h2><span class="num">7</span>ファイル一覧</h2>
+
+<h3>パイプライン実行に必要</h3>
+<ul class="flist">
+  <li><span class="fname">new_pipeline.py</span><span class="fdesc">メインパイプライン（Phase 0〜4, 1123行）</span></li>
+  <li><span class="fname">compile_rules.py</span><span class="fdesc">v2+affix_rules+decisions → rule_table.json コンパイラ（332行）</span></li>
+  <li><span class="fname">rule_table.json</span><span class="fdesc">コンパイル済みルール（gloss_map, seg_lookup, feats_map等）</span></li>
+  <li><span class="fname">decisions_full.json</span><span class="fdesc">統合辞書（chain 18件, affix, morph等）</span></li>
+  <li><span class="fname">affix_rules.json</span><span class="fdesc">Affix定義 10件（phon→seg, vclass, gloss, feats）</span></li>
+</ul>
+
+<h3>出力データ</h3>
+<ul class="flist">
+  <li><span class="fname">ja_gsd-ud-train.mudj.conllu</span><span class="fdesc">M-UDJ train (154,108 tok, Gloss 49%)</span></li>
+  <li><span class="fname">ja_gsd-ud-dev.mudj.conllu</span><span class="fdesc">M-UDJ dev (11,240 tok)</span></li>
+  <li><span class="fname">ja_gsd-ud-test.mudj.conllu</span><span class="fdesc">M-UDJ test (11,825 tok)</span></li>
+  <li><span class="fname">sample_10.mudj.conllu</span><span class="fdesc">検証用ランダムサンプル10文</span></li>
+</ul>
+
+<h3>ツール・アノテーション</h3>
+<ul class="flist">
+  <li><span class="fname">UDJ_v2.html</span><span class="fdesc">パターンアノテーションツール（22バッチ, 211パターン）</span></li>
+  <li><span class="fname">udj_v2_annotations.json</span><span class="fdesc">ユーザー定義205パターン（完了）</span></li>
+  <li><span class="fname">affix_editor.html</span><span class="fdesc">Affix定義エディタ</span></li>
+  <li><span class="fname">v2_to_v5.py</span><span class="fdesc">v2アノテーション → decisions_full.json 変換</span></li>
+  <li><span class="fname">backward_retokenizer.py</span><span class="fdesc">M-UDJ → GSD逆変換（round-trip検証用）</span></li>
+</ul>
+
+<!-- ===== RUN ===== -->
+<h2><span class="num">8</span>実行方法</h2>
+
+<pre><code><span class="hl-g"># Step 1: ルールテーブルのコンパイル</span>
+<span class="hl-b">python3</span> compile_rules.py udj_v2_annotations.json affix_rules.json decisions_full.json rule_table.json
+
+<span class="hl-g"># Step 2: GSD全体の変換</span>
+<span class="hl-b">python3</span> new_pipeline.py decisions_full.json ja_gsd-ud-train.conllu ja_gsd-ud-train.mudj.conllu
+<span class="hl-b">python3</span> new_pipeline.py decisions_full.json ja_gsd-ud-dev.conllu   ja_gsd-ud-dev.mudj.conllu
+<span class="hl-b">python3</span> new_pipeline.py decisions_full.json ja_gsd-ud-test.conllu  ja_gsd-ud-test.mudj.conllu
+
+<span class="hl-g"># 必要ファイル: decisions_full.json, affix_rules.json, rule_table.json</span>
+<span class="hl-g"># (全て同一ディレクトリに配置)</span></code></pre>
+
+<!-- ===== ISSUES ===== -->
+<h2><span class="num">9</span>残課題</h2>
+
+<div class="phase">
+  <div class="phase-box affix">
+    <div class="label">stem_split() → JSON逆算</div>
+    <div class="desc">49行のハードコード。affix_rules.json の seg フィールドから形態素境界を逆算する設計。最難関。</div>
+  </div>
+  <div class="phase-box chain">
+    <div class="label">Feats 65%未付与</div>
+    <div class="desc">名詞・副詞等にfeatsルールが少ない。feats_mapの拡充（v2パターン追加）で改善可能。</div>
+  </div>
+  <div class="phase-box sconj">
+    <div class="label">assign_gloss fallback</div>
+    <div class="desc">154行中97.8%はrule_table解決済み。残り37パターン（DET/CCONJ）はL4で対応済み、要テスト。</div>
+  </div>
+</div>
+
+<div class="phase">
+  <div class="phase-box phon">
+    <div class="label">ExtPOS未反映</div>
+    <div class="desc">v2 ov に16パターンのExtPOS定義あり。未実装。</div>
+  </div>
+  <div class="phase-box">
+    <div class="label">に DAT/LOC判別</div>
+    <div class="desc">で LOC/INS と同様のヒューリスティック。将来ML置換候補。</div>
+  </div>
+  <div class="phase-box">
+    <div class="label">Round-trip検証</div>
+    <div class="desc">backward_retokenizerのdeferred-te・サ変する対応が必要。</div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

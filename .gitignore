@@ -1,0 +1,15 @@
+.DS_Store
+~$*
+*.synctex.gz
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+current/
+*.tex
+*.bib
+*.bst
+*.pptx
+*.png
+MUDJ_corrected (1).pdf
