@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Matomonized UD Japanese — Slides</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#faf9f6;--bg2:#f0eee8;--bg3:#e6e3db;--fg:#1a1917;--fg2:#4a4840;--fg3:#8a8878;
+  --bd:#d4d1c6;--acc:#b8860b;--acc2:#8b6914;--red:#c0392b;--grn:#27834a;--blu:#2563a8;--pur:#7b3fa0;
+  --slide-w:1280px;--slide-h:720px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden;background:#e6e3db;font-family:'IBM Plex Sans','Noto Sans JP',system-ui,sans-serif}
+
+/* Slide container */
+.deck{position:relative;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center}
+.slide{
+  display:none;flex-direction:column;justify-content:flex-start;
+  width:var(--slide-w);height:var(--slide-h);
+  background:var(--bg);color:var(--fg);padding:56px 72px;
+  border-radius:4px;position:relative;overflow:hidden;
+  transform:scale(1);
+}
+.slide.active{display:flex}
+
+/* Typography */
+h1{font-size:42px;font-weight:700;line-height:1.3;margin-bottom:16px;color:var(--fg)}
+h2{font-size:32px;font-weight:600;line-height:1.3;margin-bottom:20px;color:var(--acc2)}
+h3{font-size:22px;font-weight:600;margin-bottom:12px;color:var(--acc)}
+p{font-size:20px;line-height:1.7;color:var(--fg2);margin-bottom:12px}
+ul,ol{font-size:20px;line-height:1.8;margin-left:28px;color:var(--fg)}
+li{margin-bottom:6px}
+code{font-family:'IBM Plex Mono',monospace;background:var(--bg2);padding:1px 6px;border-radius:3px;font-size:18px;color:var(--fg)}
+strong{color:var(--fg);font-weight:600}
+em{color:var(--fg2)}
+.accent{color:var(--acc2)}
+.red{color:var(--red)}
+.grn{color:var(--grn)}
+.blu{color:var(--blu)}
+
+/* Title slide */
+.slide.title{justify-content:center;padding:72px 80px}
+.slide.title h1{font-size:48px;margin-bottom:8px;color:var(--acc2)}
+.slide.title .subtitle{font-size:26px;color:var(--fg);margin-bottom:40px;font-weight:400}
+.slide.title .author{font-size:20px;color:var(--fg2)}
+.slide.title .date{font-size:18px;color:var(--fg3);margin-top:4px}
+.slide.title::before{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--acc),transparent)}
+
+/* Section slide */
+.slide.section{justify-content:center;align-items:flex-start;padding:72px 80px}
+.slide.section h1{font-size:44px;color:var(--acc2)}
+.slide.section::before{content:'';position:absolute;bottom:120px;left:80px;width:200px;height:3px;background:var(--acc)}
+
+/* Image */
+.fig{display:flex;justify-content:center;align-items:center;flex:1;min-height:0;margin:8px 0}
+.fig img{max-width:100%;max-height:100%;object-fit:contain;border-radius:6px}
+.fig.bordered img{border:1px solid var(--bd)}
+.caption{font-size:16px;color:var(--fg2);text-align:center;margin-top:4px}
+
+/* Two-column */
+.cols{display:flex;gap:40px;flex:1;min-height:0}
+.col{flex:1;display:flex;flex-direction:column;justify-content:flex-start}
+
+/* Table */
+table{border-collapse:collapse;width:100%;font-size:19px;margin:12px 0}
+th{text-align:left;padding:10px 16px;background:var(--bg2);border:1px solid var(--bd);color:var(--fg2);font-weight:600}
+td{padding:8px 16px;border:1px solid var(--bd)}
+tr:nth-child(even) td{background:rgba(0,0,0,.015)}
+
+/* Slide number */
+.slide-num{position:absolute;bottom:20px;right:36px;font-size:14px;color:var(--fg3)}
+
+/* Progress */
+.progress{position:fixed;top:0;left:0;height:3px;background:var(--acc);transition:width .3s ease;z-index:100}
+
+/* Nav hint */
+.nav-hint{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);font-size:13px;color:var(--fg3);z-index:100}
+
+/* Scale to viewport */
+@media(max-aspect-ratio:16/9){
+  .slide{transform:scale(calc(100vw / 1280))}
+}
+@media(min-aspect-ratio:16/9){
+  .slide{transform:scale(calc(100vh / 720))}
+}
+
+/* Top bar for content slides */
+.topbar{height:4px;background:var(--acc);margin:-56px -72px 24px -72px;width:calc(100% + 144px);flex-shrink:0}
+
+/* Card callout (GUIDELINE style) */
+.callout{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:20px 24px;margin:16px 0;box-shadow:0 1px 3px rgba(0,0,0,.04);border-left:4px solid var(--acc)}
+.callout.green{border-left-color:var(--grn)}
+.callout.red{border-left-color:var(--red)}
+.callout.blue{border-left-color:var(--blu)}
+
+/* Tag */
+.tag{display:inline-block;font-size:14px;padding:2px 10px;border-radius:12px;font-weight:500;margin-right:6px}
+.tag.problem{background:rgba(192,57,43,.1);color:var(--red)}
+.tag.solution{background:rgba(39,131,74,.1);color:var(--grn)}
+.tag.prior{background:rgba(37,99,168,.1);color:var(--blu)}
+
+/* Arrow */
+.arrow{color:var(--acc2);font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+<div class="deck" id="deck">
+
+<!-- ===== 1. TITLE ===== -->
+<div class="slide title">
+  <h1>Matomonized UD Japanese</h1>
+  <div class="subtitle">UD ガイドラインに準拠した改訂版ツリーバンク</div>
+  <div class="author">下地 理則（Michinori Shimoji）</div>
+  <div class="date">2026.04.07</div>
+</div>
+
+<!-- ===== 2. 発表の流れ ===== -->
+<div class="slide">
+  <div class="topbar"></div>
+  <h2>発表の流れ</h2>
+  <ol style="font-size:24px;line-height:2.2;margin-top:16px">
+    <li>背景：Universal Dependencies（UD）とは</li>
+    <li>UD Japanese（UDJ）の 3 つの根本的問題</li>
+    <li>先行研究（Taguchi & Chiang 2023）と問題点</li>
+    <li>提案：MUDJ と Matomonizer パイプライン</li>
+    <li>他の日琉諸語への展開</li>
+    <li>まとめ</li>
+  </ol>
+</div>
+
+<!-- ===== 3. UD とは ===== -->
+<div class="slide">
+  <div class="topbar"></div>
+  <h2>Universal Dependencies（UD）とは</h2>
+  <div class="cols">
+    <div class="col">
+      <ul>
+        <li>依存文法に基づく、<strong>通言語的に一貫した</strong>形態・統語アノテーション枠組み</li>
+        <li>180 以上の言語、300 以上のツリーバンク（v2.17）</li>
+      </ul>
+      <h3 style="margin-top:24px">UD の基本原則</h3>
+      <ol>
+        <li><span class="accent">語（word）ベース</span>のアノテーション</li>
+        <li>語の内部構造 → <code>FEATS</code> で記述</li>
+        <li>品詞 → <code>UPOS</code>、依存関係 → <code>DepRel</code></li>
+      </ol>
+    </div>
+    <div class="col fig">
+      <img src="ude.png" alt="UD English example">
+    </div>
+  </div>
+</div>
+
+<!-- ===== 4. 問題の概要 ===== -->
+<div class="slide">
+  <div class="topbar"></div>
+  <h2>UDJ の 3 つの根本的問題</h2>
+  <p>UDJ は<span class="red">学校文法（GB）</span>に基づく仮名ベースの分析を採用<br>
+  <span class="arrow">→</span> UD の「語ベース」原則と根本的に矛盾</p>
+  <div style="margin-top:20px">
+    <table>
+      <tr><th style="width:40px">#</th><th>問題</th><th>内容</th></tr>
+      <tr><td><span class="red">1</span></td><td><strong>トークン化</strong></td><td>形態素レベルの分割（語レベルではない）</td></tr>
+      <tr><td><span class="red">2</span></td><td><strong>FEATS</strong></td><td>形態論的特徴の記述がほぼゼロ</td></tr>
+      <tr><td><span class="red">3</span></td><td><strong>DepRel</strong></td><td>依存関係ラベルの不適切な仕様</td></tr>
+    </table>
+  </div>
+  <p style="margin-top:20px">以下、<em>takaku nakatta</em>（高くなかった）で全問題を図示する</p>
+</div>
+
+<!-- ===== 5. 問題1 ===== -->
+<div class="slide">
+  <div class="topbar"></div>
+  <h2><span class="tag problem">問題 1</span> トークン化</h2>
+  <div class="fig" style="flex:1">
+    <img src="udj_p1_tokenization.png" alt="Tokenization problem">
+  </div>
+  <p style="text-align:center">UDJ：形態素 3 トークン（高く・なかっ・た）<span class="arrow"> → </span>MUDJ：語 2 トークン（taka-ku・na-kaQta）</p>
+</div>
+
+<!-- ===== 6. 問題2 ===== -->
+<div class="slide">
+  <div class="topbar"></div>
+  <h2><span class="tag problem">問題 2</span> FEATS（形態論的特徴）の欠如</h2>
+  <div class="fig" style="flex:1">
+    <img src="udj_p2_feats.png" alt="FEATS problem">
+  </div>
+  <p style="text-align:center">UDJ では FEATS ≈ 0% <span class="arrow">→</span> 日本語が<span class="red">「孤立語」</span>に見える致命的な問題</p>
+</div>
+
+<!-- ===== 7. 問題3 ===== -->
+<div class="slide">
+  <div class="topbar"></div>
+  <h2><span class="tag problem">問題 3</span> DepRel の不適切な仕様</h2>
+  <div class="fig" style="flex:1">
+    <img src="udj_p3_deprel.png" alt="DepRel problem">
+  </div>
+  <p style="text-align:center">UDJ：cop / advmod / aux を全て <code>aux</code> に <span class="arrow">→</span> 英語との対比が不可能</p>
+</div>
+
+<!-- ===== 8. 先行研究：成果 ===== -->
+<div class="slide">
+  <div class="topbar"></div>
+  <h2><span class="tag prior">先行研究</span> Taguchi & Chiang (2023) の成果</h2>
+  <div class="cols" style="margin-top:8px">
+    <div class="col">
+      <p style="font-size:19px">UDJ のトークン化・FEATS 問題に正面から取り組んだ先駆的研究</p>
+      <ul style="font-size:18px;line-height:1.7;margin-top:8px">
+        <li><code>XPOS</code> で助動詞を検出し先行トークンにマージ</li>
+        <li>文法機能を <code>FEATS</code> として記録</li>
+      </ul>
+      <p style="margin-top:24px"><span class="arrow">→</span> 現行 UDJ が日本語の形態的類型を<br>根本的に誤表示していることの定量的証拠</p>
+    </div>
+    <div class="col">
+      <h3>形態的複雑性の変化</h3>
+      <table style="font-size:17px">
+        <tr><th></th><th>前</th><th>後</th></tr>
+        <tr><td>vs ベトナム語</td><td>0.9998</td><td><span class="grn">0.67</span></td></tr>
+        <tr><td>vs ロシア語</td><td>0.67</td><td><span class="grn">0.9992</span></td></tr>
+        <tr><td>IS score</td><td>0.0</td><td><span class="grn">9.7–11.6</span></td></tr>
+      </table>
+      <p style="font-size:16px;color:var(--fg3);margin-top:8px">IS score: ロシア語 11.5、トルコ語 13<br>ベトナム語 0.0 → retok 後は膠着語圏に移行</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 9. 先行研究：アルゴリズムと問題点 ===== -->
+<div class="slide">
+  <div class="topbar"></div>
+  <h2><span class="tag prior">先行研究</span> アルゴリズムと問題点</h2>
+  <div class="cols">
+    <div class="col">
+      <p style="font-size:18px">助動詞を検出して先行トークンに単純マージするアルゴリズム：</p>
+      <div style="margin:12px 0;padding:14px 18px;background:var(--bg2);border-radius:8px;font-size:17px;line-height:1.7">
+        <p style="margin:0;font-size:17px">「いらっしゃら＋なかっ＋た」(3語)<br><span class="arrow">→</span> <em>irassyara-nakat-ta</em> (1語) <span class="grn">OK</span></p>
+        <p style="margin:10px 0 0;font-size:17px">「高く＋なかっ＋た」(3語)<br><span class="arrow">→</span> <span class="red">*takakunakatta</span> (1語) <span class="red">NG</span></p>
+      </div>
+      <p style="font-size:17px"><strong>問題：</strong>先行トークンが<span class="red">束縛形態素</span>か<span class="grn">自立語</span>かを区別しない</p>
+      <ul style="font-size:17px;line-height:1.6">
+        <li>高く は完全な語 → /takaku/ + /nakatta/ の 2 語が正解</li>
+        <li>形態的複雑さが<span class="red">過大評価されがち</span></li>
+        <li>/takaku/ と /nakatta/ 間の <code>aux</code> 関係が消失</li>
+      </ul>
+    </div>
+    <div class="col fig">
+      <img src="taguchi_code.png" alt="Taguchi merger algorithm code">
+    </div>
+  </div>
+</div>
+
+<!-- ===== 10. 先行研究：比較 ===== -->
+<div class="slide">
+  <div class="topbar"></div>
+  <h2><span class="tag prior">比較</span> GSD / Taguchi / MUDJ</h2>
+  <div class="fig" style="flex:1">
+    <img src="taguchiandmine.png" alt="Taguchi vs MUDJ comparison">
+  </div>
+  <p style="text-align:center;font-size:18px">GSD：3 形態素トークン・FEATS なし｜Taguchi：1 トークン・DepRel 消失｜<strong>MUDJ：2 語・FEATS 付与・DepRel 維持</strong></p>
+</div>
+
+<!-- ===== 10. MUDJ 方針 ===== -->
+<div class="slide">
+  <div class="topbar"></div>
+  <h2><span class="tag solution">提案</span> MUDJ の基本方針</h2>
+  <p><span class="grn">GB の語分割を完全に放棄</span>し、言語学的に妥当な語ベースの分割に自動変換</p>
+  <h3 style="margin-top:16px">Matomonizer パイプライン（5 フェーズ）</h3>
+  <table>
+    <tr><th>Phase</th><th>処理</th><th>例</th></tr>
+    <tr><td>P0</td><td>MWT 展開</td><td>じゃ → で＋は</td></tr>
+    <tr><td>P1</td><td>Chain 統合</td><td>ている → 2 語として統合</td></tr>
+    <tr><td>P2</td><td>接辞マージ</td><td>た・ない・ます → 語内部に統合</td></tr>
+    <tr><td>P3a</td><td>UPOS / DepRel 修正</td><td>は → <code>PART</code> / <code>advmod</code></td></tr>
+    <tr><td>P3b</td><td>音韻変換 + FEATS + Gloss</td><td>kana → phoneme、特徴付与</td></tr>
+  </table>
+  <p style="margin-top:12px;font-size:16px;color:var(--fg2)"><em>matomo=na</em>（まともな）＝「ちゃんとした」の意</p>
+</div>
+
+<!-- ===== 11. 結果 ===== -->
+<div class="slide">
+  <div class="topbar"></div>
+  <h2><span class="tag solution">結果</span> GSD 変換の成果</h2>
+  <table style="margin-top:12px">
+    <tr><th></th><th>GSD トークン数</th><th>GSD Feats</th><th>M-UDJ トークン数</th><th>Gloss</th><th>Feats</th></tr>
+    <tr><td><strong>train</strong></td><td>168,333</td><td>0.6%</td><td>154,108</td><td>48.9%</td><td>34.5%</td></tr>
+    <tr><td><strong>dev</strong></td><td>12,287</td><td>0.4%</td><td>11,240</td><td>48.7%</td><td>34.7%</td></tr>
+    <tr><td><strong>test</strong></td><td>13,034</td><td>0.8%</td><td>11,825</td><td>49.8%</td><td>36.0%</td></tr>
+  </table>
+  <div class="callout">
+    <p style="font-size:20px;color:var(--fg);margin:0"><strong>Gloss</strong>　約 49%（GSD にない新情報を付与）</p>
+    <p style="font-size:20px;color:var(--fg);margin:8px 0 0"><strong>Feats</strong>　34.5–36.0%（GSD: 0.4–0.8% → <span class="grn">+34pp</span>）</p>
+    <p style="font-size:20px;color:var(--fg);margin:8px 0 0"><strong>トークン削減</strong>　retokenization により約 8.5% 減</p>
+  </div>
+  <p style="margin-top:12px;font-size:22px"><span class="arrow">→</span> 日本語が<span class="accent">「膠着語」</span>として正しく特徴づけられる</p>
+</div>
+
+<!-- ===== 12. 全体像 ===== -->
+<div class="slide">
+  <div class="topbar"></div>
+  <h2>プロジェクトの全体像</h2>
+  <div class="fig" style="flex:1">
+    <img src="udj_panel.png" alt="Project pipeline overview">
+  </div>
+  <p style="text-align:center">UDJ <span class="arrow">→</span> MUDJ <span class="arrow">→</span> 形態素対応表 <span class="arrow">→</span> 方言・琉球諸語 UD の自動構築</p>
+</div>
+
+<!-- ===== 13. 伊良部 ===== -->
+<div class="slide">
+  <div class="topbar"></div>
+  <h2>宮古語伊良部方言への応用</h2>
+  <div class="cols">
+    <div class="col">
+      <p>日琉諸語は形態統語的に類似<br><span class="arrow">→</span> 形態素の体系的対応づけが可能</p>
+      <h3 style="margin-top:24px">例：「高くなかった」</h3>
+      <table style="font-size:20px;width:auto">
+        <tr><td style="padding-right:24px"><strong>SJ</strong></td><td><em>taka-ku　na-kaQta</em></td></tr>
+        <tr><td><strong>伊良部</strong></td><td><em>taka-f=fa　njaa-t-tar</em></td></tr>
+      </table>
+      <div class="callout green">
+        <p style="margin:0;color:var(--fg);font-size:20px">MUDJ の形態素対応表を利用して<br><span class="grn">UD 未登録の日本語方言・琉球諸語</span>の<br>ツリーバンクを自動生成</p>
+      </div>
+    </div>
+    <div class="col fig">
+      <img src="udj_panel.png" alt="Pipeline to dialects" style="max-height:400px">
+    </div>
+  </div>
+</div>
+
+<!-- ===== 14. 現状と今後 ===== -->
+<div class="slide">
+  <div class="topbar"></div>
+  <h2>現状と今後の課題</h2>
+  <div class="callout red" style="margin-top:8px">
+    <p style="font-size:20px;color:var(--fg);margin:0"><strong>現時点は試行錯誤の段階であり、かなり不完全</strong></p>
+    <ul style="font-size:18px;margin-top:8px;color:var(--fg2)">
+      <li>動詞・形容詞・助動詞周りが中心；<strong>名詞周りはほぼ手付かず</strong></li>
+      <li>ただし名詞の処理は比較的単純であり、拡張は容易</li>
+    </ul>
+  </div>
+  <h3 style="margin-top:24px">今後の展望</h3>
+  <ol style="font-size:20px;line-height:1.9">
+    <li>名詞・副詞等への Feats / Gloss ルールの拡充</li>
+    <li><span class="accent">機械学習による自動化</span>：<br>
+      <span style="font-size:18px;color:var(--fg2)">　　Matomonizer の出力を教師データとして、retokenization・UPOS・DepRel を自動予測するモデルの構築</span></li>
+    <li>方言・琉球諸語 UD の自動構築</li>
+  </ol>
+</div>
+
+<!-- ===== 15. まとめ ===== -->
+<div class="slide">
+  <div class="topbar"></div>
+  <h2>まとめ</h2>
+  <ol style="font-size:22px;line-height:2">
+    <li>UDJ は<strong>3 つの根本的問題</strong>を抱える<br>
+      <span style="color:var(--fg2);font-size:19px">　　トークン化・FEATS 欠如・DepRel 不備</span></li>
+    <li><strong>Matomonizer</strong>：GB を放棄し、語ベースの分割に自動変換</li>
+    <li><strong>MUDJ</strong>：FEATS <span class="grn">+34pp</span>、Gloss <span class="grn">49%</span>、DepRel 適正化</li>
+    <li><strong>今後</strong>：名詞拡充 → ML による自動化 → 方言・琉球諸語 UD</li>
+  </ol>
+  <div style="flex:1"></div>
+  <p style="text-align:center;font-size:28px;color:var(--fg);margin-bottom:24px">ご清聴ありがとうございました</p>
+  <p style="text-align:center;font-size:15px;color:var(--fg2)">
+    論文 PDF・パイプライン解説・ツール：
+    <a href="https://michinorishimoji.github.io/GW_20260407/" style="color:var(--acc)">michinorishimoji.github.io/GW_20260407</a>
+  </p>
+</div>
+
+</div><!-- /deck -->
+
+<div class="nav-hint" id="navHint">← → キーまたはクリックで移動</div>
+
+<script>
+const slides=document.querySelectorAll('.slide');
+let cur=0;
+function go(n){
+  if(n<0||n>=slides.length)return;
+  slides[cur].classList.remove('active');
+  cur=n;
+  slides[cur].classList.add('active');
+  document.getElementById('progress').style.width=((cur+1)/slides.length*100)+'%';
+  slides[cur].querySelector('.slide-num')||insertNum();
+}
+function insertNum(){
+  let el=slides[cur].querySelector('.slide-num');
+  if(!el){el=document.createElement('div');el.className='slide-num';slides[cur].appendChild(el)}
+  el.textContent=(cur+1)+' / '+slides.length;
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' '||e.key==='Enter')go(cur+1);
+  else if(e.key==='ArrowLeft'||e.key==='Backspace')go(cur-1);
+  else if(e.key==='Home')go(0);
+  else if(e.key==='End')go(slides.length-1);
+  document.getElementById('navHint').style.display='none';
+});
+document.addEventListener('click',e=>{
+  if(e.clientX>window.innerWidth/2)go(cur+1);else go(cur-1);
+});
+go(0);
+</script>
+</body>
+</html>
