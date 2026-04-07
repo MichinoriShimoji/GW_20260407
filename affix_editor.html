@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>M-UDJ Affix Rule Editor</title>
+<style>
+:root{--bg:#faf9f6;--bg2:#f0eee8;--bg3:#e6e3db;--fg:#1a1917;--fg2:#4a4840;--fg3:#8a8878;--bd:#d4d1c6;--acc:#b8860b;--acc2:#8b6914;--red:#c0392b;--grn:#27834a;--blu:#2563a8;--pur:#7b3fa0}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:'IBM Plex Sans','Noto Sans JP',system-ui,sans-serif;font-size:14px;line-height:1.6}
+.wrap{max-width:960px;margin:0 auto;padding:20px 20px 80px}
+h1{font-size:24px;font-weight:700;color:var(--acc2);border-bottom:3px solid var(--acc);padding-bottom:10px;margin-bottom:4px}
+h1 span{font-weight:300;font-size:13px;color:var(--fg3);display:block;margin-top:4px}
+h2{font-size:18px;font-weight:600;color:var(--fg);margin:28px 0 12px;padding:6px 0;border-bottom:1px solid var(--bd)}
+p.desc{margin:6px 0;color:var(--fg2);font-size:13px}
+code{font-family:'IBM Plex Mono','Consolas',monospace;font-size:12px;background:var(--bg2);padding:1px 5px;border-radius:3px}
+
+table{border-collapse:collapse;width:100%;margin:8px 0;font-size:13px}
+th{background:var(--bg2);font-weight:600;text-align:left;padding:6px 10px;border:1px solid var(--bd);color:var(--fg2);font-size:12px}
+td{padding:5px 10px;border:1px solid var(--bd);vertical-align:top}
+tr:nth-child(even){background:rgba(0,0,0,.015)}
+tr:hover{background:rgba(184,134,11,.04)}
+
+.toolbar{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}
+.toolbar button{background:#fff;color:var(--fg);border:1px solid var(--bd);padding:6px 16px;cursor:pointer;font-family:inherit;font-size:12px;border-radius:6px;font-weight:500;transition:all .15s}
+.toolbar button:hover{background:var(--bg2);border-color:var(--acc)}
+.toolbar button.primary{background:var(--acc);color:#fff;border-color:var(--acc2)}
+.toolbar button.primary:hover{background:var(--acc2)}
+
+.tabs{display:flex;gap:2px;border-bottom:2px solid var(--bd)}
+.tab{padding:8px 18px;background:var(--bg2);color:var(--fg3);cursor:pointer;border:1px solid transparent;border-bottom:none;border-radius:6px 6px 0 0;font-weight:500;font-size:13px;transition:all .15s}
+.tab:hover{background:var(--bg3);color:var(--fg2)}
+.tab.active{background:#fff;color:var(--acc2);border-color:var(--bd);border-bottom-color:#fff;margin-bottom:-2px;font-weight:600}
+.tab .n{display:inline-block;background:var(--acc);color:#fff;width:18px;height:18px;line-height:18px;text-align:center;border-radius:50%;font-size:10px;margin-right:4px;vertical-align:middle}
+.tab:nth-child(2) .n{background:var(--grn)}
+.tab:nth-child(3) .n{background:var(--pur)}
+.tab:nth-child(4) .n{background:var(--blu)}
+
+.panel{display:none;background:#fff;border:1px solid var(--bd);border-top:none;border-radius:0 0 10px 10px;padding:20px}
+.panel.active{display:block}
+
+input[type=text],select{background:#fff;color:var(--fg);border:1px solid var(--bd);padding:4px 8px;font-family:'IBM Plex Mono','Consolas',monospace;font-size:12px;border-radius:4px;transition:border-color .15s}
+input[type=text]:focus,select:focus{border-color:var(--acc);outline:none;box-shadow:0 0 0 2px rgba(184,134,11,.12)}
+input.phon{width:150px;color:var(--blu);font-weight:500}
+input.seg{width:130px;color:var(--pur)}
+input.gloss{width:120px;color:var(--red);font-weight:500}
+input.feats{width:210px;color:var(--grn)}
+
+.morph{color:var(--blu);font-family:'IBM Plex Mono',monospace;font-weight:500}
+.gloss-tag{color:var(--red);font-family:'IBM Plex Mono',monospace;font-weight:500}
+
+.legend{background:var(--bg2);padding:10px 14px;border-radius:6px;margin:10px 0;font-size:12px;display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.legend .sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:middle}
+
+.ah{display:flex;align-items:center;gap:12px;margin:20px 0 6px;padding:8px 12px;background:var(--bg2);border-radius:6px;border-left:4px solid var(--acc)}
+.ah .aid{font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--acc2);font-size:14px}
+.ah .al{color:var(--fg2);font-size:13px}
+.ah .at{color:var(--fg3);font-size:11px;margin-left:auto}
+
+.pc{background:#fff;border:1px solid var(--bd);padding:12px 16px;margin:8px 0;border-radius:8px;border-left:4px solid var(--acc);box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.pc:hover{border-left-color:var(--blu)}
+.pc .pid{color:var(--acc2);font-weight:600;font-size:13px}
+.pc .si{color:var(--fg3);font-size:11px;margin-left:8px}
+
+.tb{display:inline-block;border:1px solid var(--bd);padding:4px 8px;margin:2px;border-radius:6px;background:var(--bg)}
+.tb.v{border-color:var(--grn);background:rgba(39,131,74,.04)}
+.tb.a{border-color:var(--blu);background:rgba(37,99,168,.04)}
+.tb input{border:none!important;background:transparent!important;box-shadow:none!important;color:var(--blu);font-weight:600;width:130px}
+
+.add{color:var(--grn);cursor:pointer;font-size:15px;font-weight:700;padding:2px 6px;border-radius:4px}
+.add:hover{background:rgba(39,131,74,.08)}
+.del{color:var(--red);cursor:pointer;font-size:13px;padding:2px 4px;border-radius:3px}
+.del:hover{background:rgba(192,57,43,.08)}
+
+#ea{width:100%;height:300px;background:var(--bg2);color:var(--fg);border:1px solid var(--bd);font-family:'IBM Plex Mono',monospace;font-size:11px;padding:12px;border-radius:6px;resize:vertical}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>M-UDJ Affix Rule Editor
+<span>v2アノテーションからプリロード — 修正 → Export JSON → パイプラインに反映</span></h1>
+
+<div class="toolbar">
+<button class="primary" onclick="exp()">📤 Export JSON</button>
+<button onclick="imp()">📥 Import JSON</button>
+<button onclick="val()">✓ Validate</button>
+<button onclick="addA()">+ Add Affix</button>
+<button onclick="addS()">+ Add Stack Pattern</button>
+</div>
+
+<div class="tabs">
+<div class="tab active" onclick="st(this,'affixes')"><span class="n">1</span>Affix Definitions</div>
+<div class="tab" onclick="st(this,'stacking')"><span class="n">2</span>Stacking Patterns</div>
+<div class="tab" onclick="st(this,'boundaries')"><span class="n">3</span>Token Boundaries</div>
+<div class="tab" onclick="st(this,'preview')"><span class="n">4</span>Export</div>
+</div>
+
+<div id="tab-affixes" class="panel active">
+<div class="legend">
+<span><span class="sw" style="background:var(--blu)"></span><b>phon</b></span>
+<span><span class="sw" style="background:var(--pur)"></span><b>seg</b></span>
+<span><span class="sw" style="background:var(--red)"></span><b>gloss</b></span>
+<span><span class="sw" style="background:var(--grn)"></span><b>feats</b> ← auto</span>
+<span><span class="sw" style="background:var(--acc)"></span><b>vclass</b> 活用型</span>
+<span style="color:var(--fg3)">suffix=前に結合 / word=独立トークン</span>
+</div>
+<div id="ac"></div>
+</div>
+
+<div id="tab-stacking" class="panel">
+<p class="desc">各パターンの正しいトークン分割を確認・修正。<code>|</code> = トークン境界。ボックス内を直接編集可。</p>
+<div id="sc"></div>
+</div>
+
+<div id="tab-boundaries" class="panel">
+<p class="desc">各接辞の後でトークンが切れるかを指定。</p>
+<div id="bc"></div>
+</div>
+
+<div id="tab-preview" class="panel">
+<p class="desc">修正内容を <code>affix_rules.json</code> としてエクスポート</p>
+<textarea id="ea" readonly></textarea>
+<div class="toolbar" style="margin-top:8px">
+<button class="primary" onclick="cpE()">📋 Copy</button>
+<button onclick="dlE()">💾 Download</button>
+</div>
+</div>
+
+</div>
+<script>
+const D={
+"jd.ta":{gsd_lemma:"た",gsd_upos:"AUX",merge:"suffix",label:"過去/完了 PST",forms:[
+{phon:"ta",seg:"ta",gloss:"PST",feats:"Tense=Past",vclass:"any",note:"終止"},
+{phon:"da",seg:"da",gloss:"PST",feats:"Tense=Past",vclass:"any",note:"終止(有声)"},
+{phon:"tara",seg:"tara",gloss:"CND",feats:"Mood=Cnd",vclass:"any",note:"条件"},
+{phon:"dara",seg:"dara",gloss:"CND",feats:"Mood=Cnd",vclass:"any",note:"条件(有声)"},
+{phon:"tari",seg:"tari",gloss:"PST.EXEM",feats:"VerbForm=Exem",vclass:"any",note:"例示"},
+{phon:"dari",seg:"dari",gloss:"PST.EXEM",feats:"VerbForm=Exem",vclass:"any",note:"例示(有声)"}]},
+"jd.nai":{gsd_lemma:"ない",gsd_upos:"AUX",merge:"suffix",label:"否定 NEG",forms:[
+{phon:"nai",seg:"na-i",gloss:"NEG-NPST",feats:"Polarity=Neg|Tense=Pres",vclass:"any",note:"終止"},
+{phon:"naku",seg:"na-ku",gloss:"NEG-INF",feats:"Polarity=Neg|VerbForm=Inf",vclass:"any",note:"連用"},
+{phon:"nakatta",seg:"na-katta",gloss:"NEG-PST",feats:"Polarity=Neg|Tense=Past",vclass:"any",note:"過去"},
+{phon:"nakereba",seg:"na-kereba",gloss:"NEG-CND",feats:"Polarity=Neg|Mood=Cnd",vclass:"any",note:"条件"},
+{phon:"nakute",seg:"na-kute",gloss:"NEG-SEQ",feats:"Polarity=Neg|VerbForm=Conv",vclass:"any",note:"接続"},
+{phon:"naide",seg:"na-ide",gloss:"NEG-SEQ",feats:"Polarity=Neg|VerbForm=Conv",vclass:"any",note:"ないで"}]},
+"jd.reru":{gsd_lemma:"れる",gsd_upos:"AUX",merge:"suffix",label:"受身(五段) PASS",forms:[
+{phon:"areru",seg:"are-ru",gloss:"PASS-NPST",feats:"Voice=Pass|Tense=Pres",vclass:"godan",note:"終止"},
+{phon:"are",seg:"are",gloss:"PASS",feats:"Voice=Pass",vclass:"godan",note:"語幹"},
+{phon:"areta",seg:"are-ta",gloss:"PASS-PST",feats:"Voice=Pass|Tense=Past",vclass:"godan",note:"過去"},
+{phon:"arete",seg:"are-te",gloss:"PASS-SEQ",feats:"Voice=Pass|VerbForm=Conv",vclass:"godan",note:"て形"},
+{phon:"reru",seg:"reru",gloss:"PASS",feats:"Voice=Pass",vclass:"any",note:"終止(fallback)"},
+{phon:"re",seg:"re",gloss:"PASS.STM",feats:"Voice=Pass",vclass:"any",note:"語幹(fallback)"},
+{phon:"reta",seg:"re-ta",gloss:"PASS-PST",feats:"Voice=Pass|Tense=Past",vclass:"any",note:"過去(fallback)"},
+{phon:"rete",seg:"re-te",gloss:"PASS-SEQ",feats:"Voice=Pass|VerbForm=Conv",vclass:"any",note:"て形(fallback)"}]},
+"jd.rareru":{gsd_lemma:"られる",gsd_upos:"AUX",merge:"suffix",label:"受身/可能(一段/カ変) PASS/POT",forms:[
+{phon:"rareru",seg:"rare-ru",gloss:"PASS-NPST",feats:"Voice=Pass|Tense=Pres",vclass:"ichidan",note:"終止"},
+{phon:"rare",seg:"rare",gloss:"PASS",feats:"Voice=Pass",vclass:"ichidan",note:"語幹"},
+{phon:"rareta",seg:"rare-ta",gloss:"PASS-PST",feats:"Voice=Pass|Tense=Past",vclass:"ichidan",note:"過去"},
+{phon:"rarete",seg:"rare-te",gloss:"PASS-SEQ",feats:"Voice=Pass|VerbForm=Conv",vclass:"ichidan",note:"て形"},
+{phon:"rareru",seg:"rare-ru",gloss:"PASS-NPST",feats:"Voice=Pass|Tense=Pres",vclass:"kahen",note:"終止(カ変)"},
+{phon:"rare",seg:"rare",gloss:"PASS",feats:"Voice=Pass",vclass:"kahen",note:"語幹(カ変)"}]},
+"jd.seru":{gsd_lemma:"せる",gsd_upos:"AUX",merge:"suffix",label:"使役 CAUS",forms:[
+{phon:"aseru",seg:"ase-ru",gloss:"CAUS-NPST",feats:"Voice=Cau|Tense=Pres",vclass:"godan",note:"終止(五段)"},
+{phon:"ase",seg:"ase",gloss:"CAUS",feats:"Voice=Cau",vclass:"godan",note:"語幹(五段)"},
+{phon:"aseta",seg:"ase-ta",gloss:"CAUS-PST",feats:"Voice=Cau|Tense=Past",vclass:"godan",note:"過去(五段)"},
+{phon:"asete",seg:"ase-te",gloss:"CAUS-SEQ",feats:"Voice=Cau|VerbForm=Conv",vclass:"godan",note:"て形(五段)"},
+{phon:"saseru",seg:"sase-ru",gloss:"CAUS-NPST",feats:"Voice=Cau|Tense=Pres",vclass:"ichidan",note:"終止(一段)"},
+{phon:"sase",seg:"sase",gloss:"CAUS",feats:"Voice=Cau",vclass:"ichidan",note:"語幹(一段)"},
+{phon:"saseta",seg:"sase-ta",gloss:"CAUS-PST",feats:"Voice=Cau|Tense=Past",vclass:"ichidan",note:"過去(一段)"},
+{phon:"sasete",seg:"sase-te",gloss:"CAUS-SEQ",feats:"Voice=Cau|VerbForm=Conv",vclass:"ichidan",note:"て形(一段)"},
+{phon:"se",seg:"se",gloss:"CAUS.STM",feats:"Voice=Cau",vclass:"sahen",note:"語幹(サ変: さ+せ)"},
+{phon:"seru",seg:"se-ru",gloss:"CAUS-NPST",feats:"Voice=Cau|Tense=Pres",vclass:"sahen",note:"終止(サ変)"},
+{phon:"saseru",seg:"sase-ru",gloss:"CAUS-NPST",feats:"Voice=Cau|Tense=Pres",vclass:"kahen",note:"終止(カ変: こ+させ)"},
+{phon:"sase",seg:"sase",gloss:"CAUS",feats:"Voice=Cau",vclass:"kahen",note:"語幹(カ変)"}]},
+"jd.masu":{gsd_lemma:"ます",gsd_upos:"AUX",merge:"suffix",label:"丁寧 POL",forms:[
+{phon:"masu",seg:"mas-u",gloss:"POL-NPST",feats:"Polite=Form|Tense=Pres",vclass:"any",note:"終止"},
+{phon:"masi",seg:"mas-i",gloss:"POL-INF",feats:"Polite=Form|VerbForm=Inf",vclass:"any",note:"連用"},
+{phon:"masita",seg:"mas-ita",gloss:"POL-PST",feats:"Polite=Form|Tense=Past",vclass:"any",note:"過去"},
+{phon:"masen",seg:"mas-en",gloss:"POL-NEG",feats:"Polite=Form|Polarity=Neg",vclass:"any",note:"否定"},
+{phon:"masjoo",seg:"mas-joo",gloss:"POL-OPT",feats:"Polite=Form|Mood=Opt",vclass:"any",note:"意志"},
+{phon:"mase",seg:"mas-e",gloss:"POL-IMP",feats:"Polite=Form|Mood=Imp",vclass:"any",note:"未然"}]},
+"jd.tai":{gsd_lemma:"たい",gsd_upos:"AUX",merge:"suffix",label:"希望 DES",forms:[
+{phon:"tai",seg:"ta-i",gloss:"DES-NPST",feats:"Mood=Des|Tense=Pres",vclass:"any",note:"終止"},
+{phon:"taku",seg:"ta-ku",gloss:"DES-INF",feats:"Mood=Des|VerbForm=Inf",vclass:"any",note:"連用"},
+{phon:"takatta",seg:"ta-katta",gloss:"DES-PST",feats:"Mood=Des|Tense=Past",vclass:"any",note:"過去"}]},
+"jd.zu":{gsd_lemma:"ず",gsd_upos:"AUX",merge:"suffix",label:"否定連用(文語) NEG.INF",forms:[
+{phon:"zu",seg:"z-u",gloss:"NEG-INF",feats:"Polarity=Neg|VerbForm=Inf",vclass:"any",note:"連用"},
+{phon:"zuni",seg:"z-uni",gloss:"NEG-SEQ",feats:"Polarity=Neg|VerbForm=Conv",vclass:"any",note:"ずに"},
+{phon:"zaru",seg:"z-aru",gloss:"NEG-ADN",feats:"Polarity=Neg|VerbForm=Part",vclass:"any",note:"ざる"}]},
+"sf.teki":{gsd_lemma:"的",gsd_upos:"PART",merge:"suffix",label:"形容詞派生 ADJ.DRV",forms:[
+{phon:"teki",seg:"teki",gloss:"ADJ.DRV",feats:"",vclass:"any",note:"的"}]}
+};
+
+const S=[
+{id:"vaux1",phon:"tabe-ta",gloss:"食べる-PST",stack:["V","jd.ta"],tokens:["tabe-ta"]},
+{id:"vaux3",phon:"tabe-na-i",gloss:"食べる-NEG-PRS",stack:["V","jd.nai"],tokens:["tabe-nai"]},
+{id:"vaux4",phon:"tabe-na-katta",gloss:"食べる-NEG-PST",stack:["V","jd.nai(katta)"],tokens:["tabe-nakatta"]},
+{id:"vaux5",phon:"tabe-na-kereba",gloss:"食べる-NEG-COND",stack:["V","jd.nai(kereba)"],tokens:["tabe-nakereba"]},
+{id:"vaux6",phon:"tabe-mas-u",gloss:"食べる-POL-PRS",stack:["V","jd.masu"],tokens:["tabe-masu"]},
+{id:"vaux7",phon:"tabe-mas-ta",gloss:"食べる-POL-PST",stack:["V","jd.masu(ita)"],tokens:["tabe-masita"]},
+{id:"vaux8",phon:"tabe-mas-en",gloss:"食べる-POL-NEG",stack:["V","jd.masu(en)"],tokens:["tabe-masen"]},
+{id:"vaux9",phon:"tabe-mas-en=des-ta",gloss:"食べる-POL-NEG=COP.POL-PST",stack:["V","jd.masu(en)","cop"],tokens:["tabe-masen","desita"]},
+{id:"vaux10",phon:"tabe-ta-i",gloss:"食べる-DES-PRS",stack:["V","jd.tai"],tokens:["tabe-tai"]},
+{id:"vaux11",phon:"tabe-ta-katta",gloss:"食べる-DES-PST",stack:["V","jd.tai(katta)"],tokens:["tabe-takatta"]},
+{id:"vaux12",phon:"tabe-rare-ru",gloss:"食べる-PASS-PRS",stack:["V","jd.rareru"],tokens:["tabe-rareru"]},
+{id:"vaux13",phon:"tabe-rare-ta",gloss:"食べる-PASS-PST",stack:["V","jd.rareru","jd.ta"],tokens:["tabe-rareta"]},
+{id:"vaux14",phon:"tabe-sase-ru",gloss:"食べる-CAUS-PRS",stack:["V","jd.seru"],tokens:["tabe-saseru"]},
+{id:"vaux15",phon:"tabe-sase-ta",gloss:"食べる-CAUS-PST",stack:["V","jd.seru","jd.ta"],tokens:["tabe-saseta"]},
+{id:"vaux16",phon:"tabe-sase-rare-ta",gloss:"食べる-CAUS-PASS-PST",stack:["V","jd.seru","jd.rareru","jd.ta"],tokens:["tabe-saserareta"]},
+{id:"vc2",phon:"tabe-na-kute",gloss:"食べる-NEG-SEQ",stack:["V","jd.nai(kute)"],tokens:["tabe-nakute"]},
+{id:"vc6",phon:"tabe-rare-na-i",gloss:"食べる-POT-NEG-PRS",stack:["V","jd.rareru","jd.nai"],tokens:["tabe-rarenai"]},
+{id:"vc7",phon:"tabe-mas-joo",gloss:"食べる-POL-OPT",stack:["V","jd.masu(joo)"],tokens:["tabe-masjoo"]},
+{id:"te1",phon:"tabe-te i-ru",gloss:"食べる-SEQ PROG-PRS",stack:["V","-te","| AUX"],tokens:["tabe-te","ir-u"]},
+{id:"te2",phon:"tabe-te i-ta",gloss:"食べる-SEQ PROG-PST",stack:["V","-te","| AUX+ta"],tokens:["tabe-te","i-ta"]},
+{id:"te3",phon:"tabe-te i-mas-u",gloss:"食べる-SEQ PROG-POL-PRS",stack:["V","-te","| AUX+masu"],tokens:["tabe-te","i-masu"]},
+{id:"te4",phon:"tabe-te i-na-i",gloss:"食べる-SEQ PROG-NEG-PRS",stack:["V","-te","| AUX+nai"],tokens:["tabe-te","i-nai"]},
+{id:"te5",phon:"tabe-te sima-u",gloss:"食べる-SEQ UCPRF-PRS",stack:["V","-te","| simau"],tokens:["tabe-te","sima-u"]},
+{id:"te6",phon:"tabe-te simaQ-ta",gloss:"食べる-SEQ UCPRF-PST",stack:["V","-te","| simau+ta"],tokens:["tabe-te","simaQ-ta"]},
+{id:"te7",phon:"tabe-te ku-ru",gloss:"食べる-SEQ ENDO-PRS",stack:["V","-te","| kuru"],tokens:["tabe-te","ku-ru"]},
+{id:"te8",phon:"tabe-te i-ku",gloss:"食べる-SEQ EXO-PRS",stack:["V","-te","| iku"],tokens:["tabe-te","i-ku"]},
+{id:"te9",phon:"tabe-te kure-ru",gloss:"食べる-SEQ BEN-PRS",stack:["V","-te","| kureru"],tokens:["tabe-te","kure-ru"]},
+{id:"te10",phon:"tabe-te mora-u",gloss:"食べる-SEQ BEN-PRS",stack:["V","-te","| morau"],tokens:["tabe-te","mora-u"]},
+{id:"te11",phon:"tabe-te ok-u",gloss:"食べる-SEQ PROS-PRS",stack:["V","-te","| oku"],tokens:["tabe-te","ok-u"]},
+{id:"te12",phon:"tabe-te mi-ru",gloss:"食べる-SEQ CON-PRS",stack:["V","-te","| miru"],tokens:["tabe-te","mi-ru"]},
+{id:"te13",phon:"tabe-te kudasa-i",gloss:"食べる-SEQ BEN.HON-IMP",stack:["V","-te","| kudasaru"],tokens:["tabe-te","kudasa-i"]},
+{id:"gimu1",phon:"tabe-na-kereba nara-na-i",gloss:"食べる-NEG-COND なる-NEG-PRS",stack:["V","nai(kereba)","| naru+nai"],tokens:["tabe-nakereba","nara-nai"]},
+{id:"setsu1",phon:"tabe-ru=kara",gloss:"食べる-PRS=CSL",stack:["V","=kara"],tokens:["tabe-ru=kara"]},
+{id:"setsu2",phon:"tabe-ru=node",gloss:"食べる-PRS=CSL",stack:["V","=node"],tokens:["tabe-ru=node"]},
+{id:"setsu8",phon:"tabe-nagara",gloss:"食べる-SIM",stack:["V","-nagara"],tokens:["tabe-nagara"]},
+{id:"setsu9",phon:"tabe-tari non-dari su-ru",gloss:"食べる-EXM 飲む-EXM する-PRS",stack:["V","-tari"],tokens:["tabe-tari","non-dari","su-ru"]},
+{id:"ishi1",phon:"tabe-joo",gloss:"食べる-INT",stack:["V","-joo"],tokens:["tabe-joo"]},
+{id:"ishi3",phon:"tabe-ro",gloss:"食べる-IMP",stack:["V","-ro"],tokens:["tabe-ro"]},
+{id:"ishi4",phon:"tabe-nasai",gloss:"食べる-POL.IMP",stack:["V","-nasai"],tokens:["tabe-nasai"]},
+{id:"ishi5",phon:"tabe-runa",gloss:"食べる-PROH",stack:["V","-runa"],tokens:["tabe-runa"]},
+];
+
+const B=[
+{after:"jd.ta",boundary:"no",note:"た: 前に結合。条件形tara/tariも結合"},
+{after:"jd.nai",boundary:"no",note:"ない: 前に結合。全活用形が結合"},
+{after:"jd.reru",boundary:"no",note:"れる: 前に結合"},
+{after:"jd.rareru",boundary:"no",note:"られる: 前に結合"},
+{after:"jd.seru",boundary:"no",note:"せる/させる: 前に結合"},
+{after:"jd.masu",boundary:"no",note:"ます: 前に結合"},
+{after:"jd.tai",boundary:"no",note:"たい: 前に結合"},
+{after:"jd.zu",boundary:"no",note:"ず: 前に結合"},
+{after:"-te",boundary:"yes",note:"て: verb-teで1tok。次のAUXは新トークン"},
+{after:"-ba / -reba",boundary:"yes",note:"ば: verb-(re)baで1tok。次は新トークン"},
+{after:"=kara",boundary:"yes",note:"から(SCONJ): =suffix。次は新トークン"},
+{after:"=node",boundary:"yes",note:"ので: =suffix。次は新トークン"},
+{after:"=ga",boundary:"yes",note:"が(SCONJ): =suffix。次は新トークン"},
+{after:"=kedo",boundary:"yes",note:"けど: =suffix。次は新トークン"},
+{after:"=si",boundary:"yes",note:"し: =suffix。次は新トークン"},
+{after:"=noni",boundary:"yes",note:"のに: =suffix。次は新トークン"},
+{after:"=mo",boundary:"context",note:"ても→verb-te=mo(同tok) / それ以外は要確認"},
+{after:"=wa",boundary:"context",note:"ては/なくては→同tok内suffix"},
+{after:"=no=da",boundary:"no",note:"のだ系: 前に結合"},
+{after:"-nagara",boundary:"yes",note:"ながら: verb-nagara。次は新トークン"},
+{after:"-tari",boundary:"yes",note:"たり: verb-tari。次は新トークン"},
+];
+
+function st(el,n){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));el.classList.add('active');document.getElementById('tab-'+n).classList.add('active');if(n==='preview')ge()}
+
+// ── Gloss → Feats auto-mapping ──
+const G2F={
+  // Tense
+  PST:'Tense=Past', NPST:'Tense=Pres', PRS:'Tense=Pres',
+  // Polarity
+  NEG:'Polarity=Neg',
+  // Voice
+  PASS:'Voice=Pass', CAUS:'Voice=Cau', POT:'Mood=Pot',
+  // Politeness
+  POL:'Polite=Form', HON:'Polite=Elev', HUM:'Polite=Humb',
+  // Mood
+  DES:'Mood=Des', OPT:'Mood=Opt', IMP:'Mood=Imp', PROH:'Mood=Proh',
+  CND:'Mood=Cnd', COND:'Mood=Cnd', CJC:'Mood=Cjc', INT:'Mood=Int',
+  // VerbForm
+  SEQ:'VerbForm=Conv', GER:'VerbForm=Conv', INF:'VerbForm=Inf',
+  ADN:'VerbForm=Part', EXEM:'VerbForm=Exem', CONV:'VerbForm=Conv',
+  // Aspect
+  PROG:'Aspect=Prog', PRF:'Aspect=Perf',
+  // Case (for particles)
+  NOM:'Case=Nom', ACC:'Case=Acc', DAT:'Case=Dat', GEN:'Case=Gen',
+  ABL:'Case=Abl', INS:'Case=Ins', COM:'Case=Com', TOP:'Case=Top',
+  LOC:'Case=Loc', ALL:'Case=All',
+  // Skip: these are glosses but don't map to UD feats
+  STM:'', STV:'', COP:'', FN:'', NMLZ:'', LV:'',
+  THM:'', ADD:'', EXH:'', PUNCT:'', DEM:'', QUOT:'',
+  CSL:'', CNC:'', SIM:'', EXM:'', LCT:'', CRTN:'',
+  RESTR:'', DISJ:'', SFP:'', NLZ:'', UCPRF:'', ENDO:'',
+  EXO:'', BEN:'', PROS:'', CON:'', INFR:'', HS:'',
+  EVD:'', OBL:'', PUR:'', LMT:'', EQV:'', ADJ:'', DRV:'',
+  VLZ:'', EXC:'', IDF:'', ROLE:'', TOPIC:'',
+};
+
+function glossToFeats(gloss){
+  // Split by - and . to get atoms, skip Japanese/stem parts
+  const atoms = gloss.split(/[-.]/).map(a=>a.trim().toUpperCase());
+  const feats = new Set();
+  for(const a of atoms){
+    if(!a) continue;
+    const f = G2F[a];
+    if(f) feats.add(f);
+    // Skip unknown atoms silently (stem glosses like 食べる, etc.)
+  }
+  return [...feats].sort().join('|');
+}
+
+function onGlossInput(aid, fi, val){
+  D[aid].forms[fi].gloss = val;
+  const auto = glossToFeats(val);
+  if(auto){
+    D[aid].forms[fi].feats = auto;
+    // Update the feats input visually
+    const fInput = document.getElementById('f_'+aid+'_'+fi);
+    if(fInput){
+      fInput.value = auto;
+      fInput.style.background = 'rgba(39,131,74,.06)';
+      fInput.title = 'auto-filled from gloss';
+    }
+  }
+}
+
+function rA(){const c=document.getElementById('ac');let h='';
+for(const[a,d]of Object.entries(D)){
+h+=`<div class="ah"><span class="aid">${a}</span><span class="al">${d.label}</span><span class="at">GSD: <code>${d.gsd_lemma}</code>/${d.gsd_upos}</span>
+<select onchange="D['${a}'].merge=this.value" style="margin-left:8px;font-size:11px"><option value="suffix"${d.merge==='suffix'?' selected':''}>suffix</option><option value="word"${d.merge==='word'?' selected':''}>word</option></select></div>`;
+h+=`<table><tr><th>phon</th><th>seg</th><th>gloss</th><th>feats <span style="font-weight:400;color:var(--grn);font-size:10px">← auto</span></th><th>vclass</th><th>note</th><th></th></tr>`;
+d.forms.forEach((f,i)=>{const vc=f.vclass||'any';h+=`<tr>
+<td><input class="phon" value="${f.phon}" onchange="D['${a}'].forms[${i}].phon=this.value"></td>
+<td><input class="seg" value="${f.seg}" onchange="D['${a}'].forms[${i}].seg=this.value"></td>
+<td><input class="gloss" value="${f.gloss}" oninput="onGlossInput('${a}',${i},this.value)" onchange="onGlossInput('${a}',${i},this.value)"></td>
+<td><input class="feats" id="f_${a}_${i}" value="${f.feats}" onchange="D['${a}'].forms[${i}].feats=this.value;this.style.background=''" title="edit to override auto-fill"></td>
+<td><select onchange="D['${a}'].forms[${i}].vclass=this.value" style="width:75px;font-size:11px;color:var(--acc2)">
+<option value="any"${vc==='any'?' selected':''}>any</option>
+<option value="godan"${vc==='godan'?' selected':''}>五段</option>
+<option value="ichidan"${vc==='ichidan'?' selected':''}>一段</option>
+<option value="sahen"${vc==='sahen'?' selected':''}>サ変</option>
+<option value="kahen"${vc==='kahen'?' selected':''}>カ変</option>
+</select></td>
+<td><input type="text" value="${f.note||''}" onchange="D['${a}'].forms[${i}].note=this.value" style="width:55px;font-size:11px"></td>
+<td><span class="del" onclick="D['${a}'].forms.splice(${i},1);rA()">✕</span></td></tr>`});
+h+=`<tr><td colspan="7"><span class="add" onclick="D['${a}'].forms.push({phon:'',seg:'',gloss:'',feats:'',vclass:'any',note:''});rA()">+ 追加</span></td></tr></table>`}
+c.innerHTML=h}
+
+function rS(){const c=document.getElementById('sc');let h='';
+S.forEach((p,pi)=>{const th=p.tokens.map((t,ti)=>{const cl=ti===0?'v':'a';return`<span class="tb ${cl}"><input value="${t}" onchange="S[${pi}].tokens[${ti}]=this.value"></span>`}).join(' <b style="color:var(--red)">|</b> ');
+h+=`<div class="pc"><span class="pid">${p.id}</span><span class="si">${p.stack.join(' → ')}</span>
+<div style="margin:5px 0"><span style="color:var(--fg3);font-size:12px">v2:</span> <span class="morph">${p.phon}</span> <span class="gloss-tag">${p.gloss}</span></div>
+<div><span style="color:var(--fg3);font-size:12px">Tokens:</span> ${th} <span class="add" onclick="S[${pi}].tokens.push('');rS()">+</span></div></div>`});
+c.innerHTML=h}
+
+function rB(){const c=document.getElementById('bc');let h='<table><tr><th>After</th><th>Boundary?</th><th>Note</th></tr>';
+B.forEach((r,i)=>{h+=`<tr><td><code>${r.after}</code></td>
+<td><select onchange="B[${i}].boundary=this.value" style="width:140px">
+<option value="yes"${r.boundary==='yes'?' selected':''}>✂ yes</option>
+<option value="no"${r.boundary==='no'?' selected':''}>→ no</option>
+<option value="context"${r.boundary==='context'?' selected':''}>? context</option></select></td>
+<td><input type="text" value="${r.note}" onchange="B[${i}].note=this.value" style="width:100%"></td></tr>`});
+h+='</table>';c.innerHTML=h}
+
+function ge(){const o={_meta:{tool:"affix_editor",exported:new Date().toISOString()},affix_definitions:D,stacking_patterns:S,boundary_rules:B,gloss_to_feats:G2F};const j=JSON.stringify(o,null,2);document.getElementById('ea').value=j;return j}
+function exp(){st(document.querySelectorAll('.tab')[3],'preview')}
+function cpE(){ge();navigator.clipboard.writeText(document.getElementById('ea').value).then(()=>alert('Copied!'))}
+function dlE(){const j=ge();const b=new Blob([j],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='affix_rules.json';a.click()}
+function imp(){const i=document.createElement('input');i.type='file';i.accept='.json';i.onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());if(d.affix_definitions)Object.assign(D,d.affix_definitions);if(d.stacking_patterns){S.length=0;S.push(...d.stacking_patterns)}if(d.boundary_rules){B.length=0;B.push(...d.boundary_rules)}rAll();alert('Imported!')}catch(e){alert('Error: '+e.message)}};i.click()}
+function val(){let e=[];for(const[a,d]of Object.entries(D))d.forms.forEach((f,i)=>{if(!f.phon)e.push(a+`[${i}]: phon empty`);if(!f.gloss)e.push(a+`[${i}]: gloss empty`)});S.forEach(p=>p.tokens.forEach((t,i)=>{if(!t)e.push(p.id+`[${i}]: empty`)}));alert(e.length?'⚠ '+e.join('\n'):'✓ All valid!')}
+function addA(){const id=prompt('Affix ID:');if(!id)return;D[id]={gsd_lemma:prompt('GSD lemma:')||'',gsd_upos:'AUX',merge:'suffix',label:prompt('Label:')||'',forms:[{phon:'',seg:'',gloss:'',feats:'',note:''}]};rA()}
+function addS(){S.push({id:prompt('ID:')||'new',phon:prompt('phon:')||'',gloss:prompt('gloss:')||'',stack:[],tokens:['']});rS()}
+function rAll(){rA();rS();rB()}
+rAll();
+</script>
+</body>
+</html>

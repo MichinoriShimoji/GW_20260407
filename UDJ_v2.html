@@ -1,0 +1,1655 @@
+<!DOCTYPE html>
+<!-- saved from url=(0062)file:///Users/michinorishimoji2023/Downloads/UDJ_v2%20(1).html -->
+<html lang="ja"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UDJ v2 アノテーションツール</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link href="file:///Users/michinorishimoji2023/Downloads/UDJ%20v2_files/css2" rel="stylesheet">
+<style>
+:root{--bg:#1a1b1e;--bg2:#222328;--bg3:#2a2b30;--bg4:#33343a;--fg:#e8e6e1;--fg2:#b0ada5;--fg3:#7a7670;--acc:#e8a948;--acc2:#f0c060;--acc-dim:rgba(232,169,72,.15);--grn:#5cb87a;--grn-dim:rgba(92,184,122,.12);--red:#d95f5f;--red-dim:rgba(217,95,95,.12);--blu:#5b9bd5;--blu-dim:rgba(91,155,213,.12);--pink:#c77dba;--pink-dim:rgba(199,125,186,.12);--bd:#3a3b40;--bd2:#4a4b52;--r:6px}
+*{margin:0;padding:0;box-sizing:border-box}html{font-size:15px}
+body{font-family:'Noto Sans JP','IBM Plex Mono',sans-serif;background:var(--bg);color:var(--fg);min-height:100vh}
+.shell{max-width:1060px;margin:0 auto;padding:16px 20px 80px}
+header{display:flex;align-items:center;justify-content:space-between;padding:12px 0 16px;border-bottom:1px solid var(--bd);margin-bottom:16px}
+header h1{font-family:'Noto Serif JP',serif;font-size:1.15rem;font-weight:700;color:var(--acc)}
+header h1 span{font-family:'IBM Plex Mono',monospace;font-size:.7rem;font-weight:500;color:var(--fg3);margin-left:8px}
+.hdr-btns{display:flex;gap:6px}
+.hdr-btns button{font-family:'IBM Plex Mono',monospace;font-size:.72rem;padding:5px 12px;border-radius:var(--r);border:1px solid var(--bd);background:var(--bg2);color:var(--fg2);cursor:pointer;transition:.15s}
+.hdr-btns button:hover{border-color:var(--acc);color:var(--acc)}
+.hdr-btns button.primary{background:var(--acc-dim);border-color:var(--acc);color:var(--acc)}
+.progress-bar{display:flex;gap:2px;margin-bottom:6px}
+.pip{flex:1;height:6px;border-radius:3px;background:var(--bg3);cursor:pointer;transition:.2s}
+.pip:hover{transform:scaleY(1.8)}.pip.done{background:var(--grn)}.pip.active{background:var(--acc);box-shadow:0 0 8px rgba(232,169,72,.4)}.pip.partial{background:var(--acc-dim);border:1px solid var(--acc)}
+.progress-info{font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--fg3);margin-bottom:14px;display:flex;justify-content:space-between}
+.card{background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:16px 20px;margin-bottom:10px}
+.card-title{font-family:'IBM Plex Mono',monospace;font-size:.68rem;font-weight:600;color:var(--fg3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}
+.batch-bar{display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap}
+.batch-btn{font-family:'IBM Plex Mono',monospace;font-size:.66rem;padding:3px 8px;border-radius:var(--r);border:1px solid var(--bd);background:var(--bg2);color:var(--fg3);cursor:pointer;transition:.15s}
+.batch-btn:hover{border-color:var(--fg2);color:var(--fg2)}.batch-btn.active{background:var(--acc-dim);border-color:var(--acc);color:var(--acc)}
+.batch-count{font-size:.58rem;opacity:.6;margin-left:3px}
+.sent-num{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--acc);font-weight:600}
+.sent-ja{font-size:1.3rem;font-weight:700;color:var(--fg);margin:6px 0 4px;letter-spacing:.02em;line-height:1.5}
+.sent-suw{font-family:'IBM Plex Mono',monospace;font-size:.76rem;color:var(--fg3);line-height:1.7}
+.suw{display:inline-block;background:var(--bg3);padding:1px 6px;border-radius:3px;margin:2px;border:1px solid var(--bd)}
+.sent-note{font-size:.78rem;color:var(--fg3);margin-top:4px;font-style:italic}
+.field{margin-bottom:10px}.field-label{font-family:'IBM Plex Mono',monospace;font-size:.68rem;font-weight:600;color:var(--fg3);margin-bottom:3px;display:flex;align-items:center;gap:6px}
+.field-label .hint{font-weight:400;opacity:.6;font-size:.62rem}
+.field input,.field textarea{width:100%;font-family:'IBM Plex Mono',monospace;font-size:.85rem;background:var(--bg);border:1px solid var(--bd);border-radius:var(--r);padding:7px 10px;color:var(--fg);outline:none;transition:.2s}
+.field input:focus,.field textarea:focus{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc-dim)}
+.field textarea{resize:vertical;min-height:32px;line-height:1.5}
+/* Word table */
+.wt{width:100%;border-collapse:collapse;font-size:.75rem;font-family:'IBM Plex Mono',monospace}
+.wt th{font-size:.62rem;color:var(--fg3);text-align:left;padding:3px 5px;border-bottom:1px solid var(--bd);white-space:nowrap}
+.wt td{padding:3px 5px;border-bottom:1px solid var(--bg3);vertical-align:middle}
+.wt tr:hover{background:var(--bg3)}
+.wt .widx{color:var(--acc);font-weight:600;font-size:.68rem;width:20px}
+.wt .wphon{color:var(--acc2);font-weight:500}
+.wt .wgloss{color:var(--fg2)}
+.wt select{font-family:'IBM Plex Mono',monospace;font-size:.72rem;background:var(--bg);color:var(--fg);border:1px solid var(--bd);border-radius:3px;padding:2px 4px;outline:none;cursor:pointer;max-width:90px}
+.wt select:focus{border-color:var(--acc)}
+#f_phon_deep{font-style:italic}
+#f_phon_deep::placeholder{font-style:italic;opacity:.4}
+.ud-alerts{margin-top:8px}
+.ud-alert{font-family:'IBM Plex Mono',monospace;font-size:.72rem;padding:6px 10px;margin:3px 0;border-radius:4px;display:flex;align-items:flex-start;gap:6px;line-height:1.5}
+.ud-alert.error{background:rgba(217,60,60,.1);border:1px solid rgba(217,60,60,.3);color:#d93c3c}
+.ud-alert.warn{background:rgba(210,153,34,.1);border:1px solid rgba(210,153,34,.3);color:#b88a1a}
+.ud-alert.info{background:rgba(91,155,213,.08);border:1px solid rgba(91,155,213,.2);color:#4a8abf}
+.ud-alert .al-icon{font-size:.85rem;flex-shrink:0}
+.ud-alert .al-rule{opacity:.6;font-size:.62rem}
+.wt select.extpos-set{border-color:#d29922 !important;background:rgba(210,153,34,.1) !important;color:#d29922 !important}
+.wt select.overridden{border-color:var(--pink);color:var(--pink)}
+.ftags{display:flex;flex-wrap:wrap;gap:2px;align-items:center}
+.ftag{font-size:.65rem;padding:1px 5px;border-radius:3px;white-space:nowrap}
+.ftag.auto{background:var(--grn-dim);color:var(--grn);border:1px solid rgba(92,184,122,.2)}
+.ftag.over{background:var(--pink-dim);color:var(--pink);border:1px solid rgba(199,125,186,.25)}
+.ftag .x{cursor:pointer;margin-left:3px;opacity:.6}.ftag .x:hover{opacity:1}
+.feat-add{font-size:.65rem;background:none;border:1px dashed var(--bd);color:var(--fg3);border-radius:3px;padding:1px 5px;cursor:pointer}
+.feat-add:hover{border-color:var(--acc);color:var(--acc)}
+/* Merge diagram */
+.merge-box{margin:10px 0;overflow-x:auto}
+/* Arc SVG */
+.arc-box{overflow-x:auto;margin:8px 0;position:relative}
+.arc-box svg{display:block}
+.arc-copy-btn{position:absolute;top:4px;right:4px;font-family:'IBM Plex Mono',monospace;font-size:.6rem;padding:3px 8px;border-radius:3px;border:1px solid var(--bd);background:var(--bg);color:var(--fg3);cursor:pointer;opacity:.4;transition:opacity .15s,background .15s;z-index:2}
+.arc-copy-btn:hover{opacity:1;background:var(--bg2)}
+.arc-copy-btn.copied{opacity:1;background:var(--grn-dim);border-color:var(--grn);color:var(--grn)}
+/* Nav */
+.nav-row{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:14px}
+.nav-btn{font-family:'IBM Plex Mono',monospace;font-size:.76rem;padding:7px 18px;border-radius:var(--r);border:1px solid var(--bd);background:var(--bg2);color:var(--fg2);cursor:pointer;transition:.15s}
+.nav-btn:hover{border-color:var(--acc);color:var(--acc)}.nav-btn:disabled{opacity:.3;cursor:default}
+.nav-btn.done-btn{background:var(--grn-dim);border-color:var(--grn);color:var(--grn)}
+.view-tog{display:flex;gap:0;margin-bottom:10px}
+.vt-btn{font-family:'IBM Plex Mono',monospace;font-size:.7rem;padding:4px 12px;border:1px solid var(--bd);background:var(--bg2);color:var(--fg3);cursor:pointer;transition:.15s}
+.vt-btn:first-child{border-radius:var(--r) 0 0 var(--r)}.vt-btn:last-child{border-radius:0 var(--r) var(--r) 0}
+.vt-btn.active{background:var(--acc-dim);border-color:var(--acc);color:var(--acc)}
+.sum-table{width:100%;border-collapse:collapse;font-size:.73rem}
+.sum-table th{font-family:'IBM Plex Mono',monospace;font-size:.64rem;color:var(--fg3);text-align:left;padding:3px 6px;border-bottom:1px solid var(--bd)}
+.sum-table td{padding:3px 6px;border-bottom:1px solid var(--bg3);font-family:'IBM Plex Mono',monospace;font-size:.7rem}
+.sum-table tr:hover{background:var(--bg3)}
+.jump{color:var(--blu);cursor:pointer;text-decoration:underline}.jump:hover{color:var(--acc)}
+.gold-table{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;font-size:.72rem}
+.gold-table th{font-size:.6rem;color:var(--red);text-align:left;padding:3px 5px;border-bottom:1px solid rgba(217,95,95,.25);white-space:nowrap}
+.gold-table td{padding:3px 5px;border-bottom:1px solid var(--bg3);vertical-align:middle}
+.gold-table tr:hover{background:rgba(217,95,95,.05)}
+.gold-table .gidx{color:var(--red);font-weight:600;font-size:.65rem;opacity:.7}
+.gold-table .gform{color:var(--fg);font-weight:500}
+.gold-table .gupos{color:var(--red);font-size:.68rem}
+.gold-table .gdep{color:var(--fg2);font-size:.68rem}
+.gold-table .gfeat{color:var(--grn);font-size:.65rem}
+.warn-msg{font-size:.72rem;color:var(--red);margin-top:4px}
+.feat-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;display:flex;align-items:center;justify-content:center}
+.feat-modal{background:var(--bg2);border:1px solid var(--bd);border-radius:8px;padding:16px 20px;width:480px;max-height:80vh;overflow-y:auto}
+.feat-modal h3{font-family:'IBM Plex Mono',monospace;font-size:.8rem;color:var(--acc);margin-bottom:8px}
+.feat-search{width:100%;padding:5px 8px;margin-bottom:8px;font-family:'IBM Plex Mono',monospace;font-size:.7rem;border:1px solid var(--bd);border-radius:var(--r);background:var(--bg);color:var(--fg);outline:none}
+.feat-search:focus{border-color:var(--acc)}
+.feat-cat{margin-bottom:6px}
+.feat-cat-hdr{font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--fg3);padding:3px 6px;cursor:pointer;user-select:none;border-bottom:1px solid var(--bd);margin-bottom:2px;display:flex;justify-content:space-between}
+.feat-cat-hdr:hover{color:var(--acc)}
+.feat-cat-hdr .arrow{transition:transform .15s}
+.feat-cat-hdr.collapsed .arrow{transform:rotate(-90deg)}
+.feat-cat-body{display:flex;flex-wrap:wrap;gap:2px;padding:2px 0}
+.feat-cat-body.hidden{display:none}
+.feat-grp-label{width:100%;font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:var(--acc);padding:2px 6px;margin-top:3px;opacity:.7}
+.feat-opt{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:.68rem;padding:3px 7px;margin:1px;border-radius:3px;cursor:pointer;color:var(--fg2);border:1px solid transparent;white-space:nowrap}
+.feat-opt:hover{background:var(--bg3);border-color:var(--bd)}
+.feat-opt.selected{background:var(--grn-dim);border-color:var(--grn);color:var(--grn)}
+.feat-opt.custom-ext{border-style:dashed}
+.feat-modal .close-btn{margin-top:10px;font-family:'IBM Plex Mono',monospace;font-size:.72rem;padding:5px 14px;border-radius:var(--r);border:1px solid var(--bd);background:var(--bg);color:var(--fg2);cursor:pointer}
+.feat-modal .feat-custom-row{display:flex;gap:4px;margin-top:8px;padding-top:8px;border-top:1px solid var(--bd)}
+.feat-modal .feat-custom-row input{flex:1;padding:4px 6px;font-family:'IBM Plex Mono',monospace;font-size:.68rem;border:1px solid var(--bd);border-radius:var(--r);background:var(--bg);color:var(--fg)}
+.feat-modal .feat-custom-row button{padding:4px 10px;font-family:'IBM Plex Mono',monospace;font-size:.68rem;border:1px solid var(--acc);border-radius:var(--r);background:var(--bg);color:var(--acc);cursor:pointer}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+</style>
+</head>
+<body>
+<div class="shell" id="app">
+  <header><h1>UDJ v2 アノテーション<span>v2.0</span></h1>
+    <div class="hdr-btns"><button onclick="loadJSON()">📂 読み込み</button><button class="primary" onclick="saveJSON()">💾 保存</button></div></header>
+  <div class="batch-bar"><button class="batch-btn " onclick="S.batch=0;S.idx=0;render()">COP「だ」系<span class="batch-count">15/15</span></button><button class="batch-btn " onclick="S.batch=1;S.idx=0;render()">COP「です」系<span class="batch-count">3/3</span></button><button class="batch-btn " onclick="S.batch=2;S.idx=0;render()">動詞+AUX<span class="batch-count">16/16</span></button><button class="batch-btn " onclick="S.batch=3;S.idx=0;render()">動詞 複合<span class="batch-count">9/9</span></button><button class="batch-btn " onclick="S.batch=4;S.idx=0;render()">て形複合<span class="batch-count">13/13</span></button><button class="batch-btn " onclick="S.batch=5;S.idx=0;render()">い形容詞 基本<span class="batch-count">8/8</span></button><button class="batch-btn " onclick="S.batch=6;S.idx=0;render()">い形容詞 拡張<span class="batch-count">6/6</span></button><button class="batch-btn " onclick="S.batch=7;S.idx=0;render()">名詞述語<span class="batch-count">6/6</span></button><button class="batch-btn " onclick="S.batch=8;S.idx=0;render()">意志・命令・禁止<span class="batch-count">5/5</span></button><button class="batch-btn " onclick="S.batch=9;S.idx=0;render()">条件形<span class="batch-count">2/2</span></button><button class="batch-btn " onclick="S.batch=10;S.idx=0;render()">接続助詞<span class="batch-count">9/9</span></button><button class="batch-btn " onclick="S.batch=11;S.idx=0;render()">のだ/のです系<span class="batch-count">5/5</span></button><button class="batch-btn active" onclick="S.batch=12;S.idx=0;render()">義務・許可<span class="batch-count">3/5</span></button><button class="batch-btn " onclick="S.batch=13;S.idx=0;render()">モダリティ表現<span class="batch-count">0/8</span></button><button class="batch-btn " onclick="S.batch=14;S.idx=0;render()">形式名詞構文<span class="batch-count">0/8</span></button><button class="batch-btn " onclick="S.batch=15;S.idx=0;render()">格助詞<span class="batch-count">0/10</span></button><button class="batch-btn " onclick="S.batch=16;S.idx=0;render()">とりたて助詞<span class="batch-count">0/8</span></button><button class="batch-btn " onclick="S.batch=17;S.idx=0;render()">敬語<span class="batch-count">0/7</span></button><button class="batch-btn " onclick="S.batch=18;S.idx=0;render()">接続詞<span class="batch-count">0/10</span></button><button class="batch-btn " onclick="S.batch=19;S.idx=0;render()">副詞<span class="batch-count">0/6</span></button><button class="batch-btn " onclick="S.batch=20;S.idx=0;render()">終助詞<span class="batch-count">0/6</span></button></div>
+  <div class="view-tog">
+    <button class="vt-btn active" onclick="S.view=&#39;annotate&#39;;render()">アノテーション</button>
+    <button class="vt-btn " onclick="S.view=&#39;summary&#39;;render()">一覧</button></div>
+  
+  <div class="progress-bar"><div class="pip done active" onclick="S.idx=0;render()" title="#1 食べなければならない"></div><div class="pip done " onclick="S.idx=1;render()" title="#2 食べなくてはいけない"></div><div class="pip done " onclick="S.idx=2;render()" title="#3 食べなくてもいい"></div><div class="pip  " onclick="S.idx=3;render()" title="#4 食べてもいい"></div><div class="pip  " onclick="S.idx=4;render()" title="#5 食べるべきだ"></div></div>
+  <div class="card">
+    <div class="sent-num">#1/5 — 義務・許可</div>
+    <div class="sent-ja">食べなければならない</div>
+    <div class="sent-suw">UDJ SUW: <span class="suw">食べ</span> <span class="suw">なけれ</span> <span class="suw">ば</span> <span class="suw">なら</span> <span class="suw">ない</span></div>
+    <div class="sent-note">義務</div>
+  </div>
+  <div class="card">
+    <div class="card-title" style="color:var(--red)">UDJ 原文アノテーション（正解） <span style="font-weight:400;opacity:.5;font-size:.6rem">— GSD準拠: feats=Polarity=Negのみ (Tense等なし)</span></div>
+    <table class="gold-table"><thead><tr><th>#</th><th>形態素</th><th>UPOS</th><th>head</th><th>deprel</th><th>feats</th></tr></thead><tbody><tr>
+      <td class="gidx">1</td>
+      <td class="gform">食べ</td>
+      <td class="gupos">VERB</td>
+      <td class="gdep">0 (root)</td>
+      <td class="gdep">root</td>
+      <td class="gfeat">—</td>
+    </tr><tr>
+      <td class="gidx">2</td>
+      <td class="gform">なけれ</td>
+      <td class="gupos">AUX</td>
+      <td class="gdep">1 (食べ)</td>
+      <td class="gdep">aux</td>
+      <td class="gfeat">Polarity=Neg</td>
+    </tr><tr>
+      <td class="gidx">3</td>
+      <td class="gform">ば</td>
+      <td class="gupos">SCONJ</td>
+      <td class="gdep">2 (なけれ)</td>
+      <td class="gdep">fixed</td>
+      <td class="gfeat">—</td>
+    </tr><tr>
+      <td class="gidx">4</td>
+      <td class="gform">なら</td>
+      <td class="gupos">VERB</td>
+      <td class="gdep">2 (なけれ)</td>
+      <td class="gdep">fixed</td>
+      <td class="gfeat">—</td>
+    </tr><tr>
+      <td class="gidx">5</td>
+      <td class="gform">ない</td>
+      <td class="gupos">AUX</td>
+      <td class="gdep">2 (なけれ)</td>
+      <td class="gdep">fixed</td>
+      <td class="gfeat">Polarity=Neg</td>
+    </tr></tbody></table>
+  </div>
+  <div class="card">
+    <div class="card-title">入力</div>
+    <div class="field"><div class="field-label">音韻表記<span class="hint">スペース/= → 語境界　- → 形態素境界</span></div>
+      <input id="f_phon" value="tabe-na-kereba nara-na-i" oninput="updField(&#39;phon&#39;,this.value)"></div>
+    <div class="field"><div class="field-label">グロス<span class="hint">音韻表記と同数の語で</span></div>
+      <input id="f_gloss" value="食べる-NEG-COND なる.THM-NEG-PRS" oninput="updField(&#39;gloss&#39;,this.value)"></div>
+    <div class="field"><div class="field-label">ノート</div>
+      <textarea id="f_notes" oninput="updField(&#39;notes&#39;,this.value)" rows="1"></textarea></div>
+    
+  </div>
+  <div class="card" id="detail-card">
+    <div class="card-title">語の詳細 <span style="font-weight:400;opacity:.6">（ドロップダウンで上書き / ★=自動推定から変更済）</span></div>
+    <div id="word-detail"><table class="wt"><thead><tr><th>#</th><th>phon</th><th>gloss</th><th>UPOS</th><th>ExtPOS</th><th>deprel</th><th>head</th><th>feats</th></tr></thead><tbody><tr>
+      <td class="widx">1</td><td class="wphon">tabe-na-kereba</td><td class="wgloss">食べる-NEG-COND</td>
+      <td><select class="overridden" onchange="setOv(0,&#39;upos&#39;,this.value)"><option value="">—</option><option value="NOUN">NOUN</option><option value="PROPN">PROPN</option><option value="VERB" selected="">VERB</option><option value="ADJ">ADJ</option><option value="ADV">ADV</option><option value="ADP">ADP</option><option value="AUX">AUX</option><option value="SCONJ">SCONJ</option><option value="CCONJ">CCONJ</option><option value="PART">PART</option><option value="DET">DET</option><option value="NUM">NUM</option><option value="PRON">PRON</option><option value="INTJ">INTJ</option><option value="PUNCT">PUNCT</option><option value="SYM">SYM</option><option value="X">X</option></select></td>
+      <td><select class="overridden" onchange="setOv(0,&#39;deprel&#39;,this.value)"><option value="">—</option><option value="root" selected="">root</option><option value="nsubj">nsubj</option><option value="obj">obj</option><option value="iobj">iobj</option><option value="obl">obl</option><option value="nmod">nmod</option><option value="case">case</option><option value="mark">mark</option><option value="cop">cop</option><option value="aux">aux</option><option value="advmod">advmod</option><option value="amod">amod</option><option value="acl">acl</option><option value="advcl">advcl</option><option value="det">det</option><option value="nummod">nummod</option><option value="compound">compound</option><option value="flat">flat</option><option value="fixed">fixed</option><option value="conj">conj</option><option value="cc">cc</option><option value="discourse">discourse</option><option value="dep">dep</option><option value="punct">punct</option><option value="csubj">csubj</option><option value="ccomp">ccomp</option><option value="xcomp">xcomp</option><option value="vocative">vocative</option><option value="appos">appos</option><option value="dislocated">dislocated</option><option value="parataxis">parataxis</option></select></td>
+      <td><select class="" onchange="setOv(0,&#39;head&#39;,+this.value)"><option value="0" selected="">0:root</option><option value="2">2:nara-na-i</option></select></td>
+      <td><div class="ftags"><span class="ftag over">Mood=Cnd<span class="x" onclick="removeFeat(0,0)">×</span></span><span class="ftag over">Polarity=Neg<span class="x" onclick="removeFeat(0,1)">×</span></span><span class="ftag over">VerbForm=Conv<span class="x" onclick="removeFeat(0,2)">×</span></span><button class="feat-add" onclick="S.modal={type:&#39;feat&#39;,wi:0};render()">+</button></div></td>
+    </tr><tr>
+      <td class="widx">2</td><td class="wphon">nara-na-i</td><td class="wgloss">なる.THM-NEG-PRS</td>
+      <td><select class="overridden" onchange="setOv(1,&#39;upos&#39;,this.value)"><option value="">—</option><option value="NOUN">NOUN</option><option value="PROPN">PROPN</option><option value="VERB">VERB</option><option value="ADJ">ADJ</option><option value="ADV">ADV</option><option value="ADP">ADP</option><option value="AUX" selected="">AUX</option><option value="SCONJ">SCONJ</option><option value="CCONJ">CCONJ</option><option value="PART">PART</option><option value="DET">DET</option><option value="NUM">NUM</option><option value="PRON">PRON</option><option value="INTJ">INTJ</option><option value="PUNCT">PUNCT</option><option value="SYM">SYM</option><option value="X">X</option></select></td>
+      <td><select class="" onchange="setOv(1,&#39;deprel&#39;,this.value)"><option value="">—</option><option value="root">root</option><option value="nsubj">nsubj</option><option value="obj">obj</option><option value="iobj">iobj</option><option value="obl">obl</option><option value="nmod">nmod</option><option value="case">case</option><option value="mark">mark</option><option value="cop">cop</option><option value="aux" selected="">aux</option><option value="advmod">advmod</option><option value="amod">amod</option><option value="acl">acl</option><option value="advcl">advcl</option><option value="det">det</option><option value="nummod">nummod</option><option value="compound">compound</option><option value="flat">flat</option><option value="fixed">fixed</option><option value="conj">conj</option><option value="cc">cc</option><option value="discourse">discourse</option><option value="dep">dep</option><option value="punct">punct</option><option value="csubj">csubj</option><option value="ccomp">ccomp</option><option value="xcomp">xcomp</option><option value="vocative">vocative</option><option value="appos">appos</option><option value="dislocated">dislocated</option><option value="parataxis">parataxis</option></select></td>
+      <td><select class="overridden" onchange="setOv(1,&#39;head&#39;,+this.value)"><option value="0">0:root</option><option value="1" selected="">1:tabe-na-kereba</option></select></td>
+      <td><div class="ftags"><span class="ftag auto">Polarity=Neg<span class="x" onclick="removeFeat(1,0)">×</span></span><span class="ftag auto">Tense=Pres<span class="x" onclick="removeFeat(1,1)">×</span></span><span class="ftag over">VerbForm=Thm ⚡<span class="x" onclick="removeFeat(1,2)">×</span></span><button class="feat-add" onclick="S.modal={type:&#39;feat&#39;,wi:1};render()">+</button></div></td>
+    </tr></tbody></table></div>
+  </div>
+  <div class="card">
+    <div class="card-title">依存構造図 比較</div>
+    <div style="display:flex;gap:2px;margin-bottom:8px">
+      <span style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:.65rem;padding:2px 8px;border-radius:3px;background:var(--red-dim);color:var(--red);border:1px solid rgba(217,95,95,.2)">UDJ 原文</span>
+      <span style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:.65rem;padding:2px 8px;border-radius:3px;background:var(--blu-dim);color:var(--blu);border:1px solid rgba(91,155,213,.2)">UDJ v2</span>
+    </div>
+    <div class="arc-box"><svg width="682" height="160" style="font-family:&#39;IBM Plex Mono&#39;,monospace;display:block"><text x="16" y="12" fill="#d95f5f" font-size="9" font-weight="600">UDJ 原文 (SUW)</text><line x1="81" y1="18" x2="81" y2="98" stroke="#5cb87a" stroke-width="1.5"></line><polygon points="78,92 84,92 81,98" fill="#5cb87a"></polygon><text x="81" y="17" text-anchor="middle" fill="#5cb87a" font-size="8">root</text><path d="M81,98 Q146,60 211,98" fill="none" stroke="#d95f5f" stroke-width="1.2"></path><polygon points="208,93 214,93 211,98" fill="#d95f5f"></polygon><text x="146" y="57" text-anchor="middle" fill="#d95f5f" font-size="8">aux</text><path d="M211,98 Q276,60 341,98" fill="none" stroke="#d95f5f" stroke-width="1.2"></path><polygon points="338,93 344,93 341,98" fill="#d95f5f"></polygon><text x="276" y="57" text-anchor="middle" fill="#d95f5f" font-size="8">fixed</text><path d="M211,98 Q341,44 471,98" fill="none" stroke="#d95f5f" stroke-width="1.2"></path><polygon points="468,93 474,93 471,98" fill="#d95f5f"></polygon><text x="341" y="41" text-anchor="middle" fill="#d95f5f" font-size="8">fixed</text><path d="M211,98 Q406,28 601,98" fill="none" stroke="#d95f5f" stroke-width="1.2"></path><polygon points="598,93 604,93 601,98" fill="#d95f5f"></polygon><text x="406" y="25" text-anchor="middle" fill="#d95f5f" font-size="8">fixed</text><text x="81" y="120" text-anchor="middle" fill="var(--fg)" font-size="12" font-weight="500">食べ</text><text x="81" y="134" text-anchor="middle" fill="var(--fg3)" font-size="9">VERB</text><text x="211" y="120" text-anchor="middle" fill="var(--fg)" font-size="12" font-weight="500">なけれ</text><text x="211" y="134" text-anchor="middle" fill="var(--fg3)" font-size="9">AUX</text><text x="211" y="146" text-anchor="middle" fill="#5cb87a" font-size="7">Polarity=Neg</text><text x="341" y="120" text-anchor="middle" fill="var(--fg)" font-size="12" font-weight="500">ば</text><text x="341" y="134" text-anchor="middle" fill="var(--fg3)" font-size="9">SCONJ</text><text x="471" y="120" text-anchor="middle" fill="var(--fg)" font-size="12" font-weight="500">なら</text><text x="471" y="134" text-anchor="middle" fill="var(--fg3)" font-size="9">VERB</text><text x="601" y="120" text-anchor="middle" fill="var(--fg)" font-size="12" font-weight="500">ない</text><text x="601" y="134" text-anchor="middle" fill="var(--fg3)" font-size="9">AUX</text><text x="601" y="146" text-anchor="middle" fill="#5cb87a" font-size="7">Polarity=Neg</text></svg></div>
+    <div style="border-top:1px dashed var(--bd);margin:4px 0"></div>
+    <div class="arc-box" id="arc-v2"><svg width="292" height="130" style="font-family:&#39;IBM Plex Mono&#39;,monospace;display:block"><text x="16" y="12" fill="#5b9bd5" font-size="9" font-weight="600">UDJ v2</text><line x1="81" y1="18" x2="81" y2="68" stroke="#5cb87a" stroke-width="1.5"></line><polygon points="78,62 84,62 81,68" fill="#5cb87a"></polygon><text x="81" y="17" text-anchor="middle" fill="#5cb87a" font-size="8">root</text><path d="M81,68 Q146,30 211,68" fill="none" stroke="#5b9bd5" stroke-width="1.2"></path><polygon points="208,63 214,63 211,68" fill="#5b9bd5"></polygon><text x="146" y="27" text-anchor="middle" fill="#5b9bd5" font-size="8">aux</text><text x="81" y="90" text-anchor="middle" fill="var(--fg)" font-size="12" font-weight="500">tabe-na-kereba</text><text x="81" y="104" text-anchor="middle" fill="var(--fg3)" font-size="9">VERB</text><text x="81" y="116" text-anchor="middle" fill="#5cb87a" font-size="7">Mood=Cnd, Polarity=Neg, VerbForm=Conv</text><text x="211" y="90" text-anchor="middle" fill="var(--fg)" font-size="12" font-weight="500">nara-na-i</text><text x="211" y="104" text-anchor="middle" fill="var(--fg3)" font-size="9">AUX</text><text x="211" y="116" text-anchor="middle" fill="#5cb87a" font-size="7">Polarity=Neg, Tense=Pres, VerbForm=Thm</text></svg></div>
+  </div>
+  <details class="card" style="cursor:pointer">
+    <summary class="card-title" style="cursor:pointer;user-select:none">📖 グロス→feats リファレンス <span style="font-weight:400;opacity:.5">（クリックで展開）</span></summary>
+    <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        <div style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:.62rem;color:var(--acc);font-weight:600;margin-bottom:4px">VerbForm（活用形カテゴリ）</div>
+        <div style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:.68rem;color:var(--fg2);line-height:1.8">
+          <b style="color:var(--grn)">Conv</b> = 副動詞的接続形のみ<br>
+          　de（きれい<b>で</b>安い）COP.GER<br>
+          　ni（きれい<b>に</b>飾る）COP.ADV<br>
+          　te（食べ<b>て</b>帰る）GER<br>
+          <b style="color:var(--grn)">Part</b> = 連体形（名詞修飾）<br>
+          　na（きれい<b>な</b>花）COP.ADN<br>
+          <b style="color:var(--grn)">Fin</b> = 定形（主節述語）<br>
+          <b style="color:var(--grn)">Inf</b> = 不定形<br>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:.62rem;color:var(--acc);font-weight:600;margin-bottom:4px">Mood（条件・推量はこちら）</div>
+        <div style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:.68rem;color:var(--fg2);line-height:1.8">
+          <b style="color:var(--blu)">Cnd</b> = 条件（≠Conv）<br>
+          　nara（きれい<b>なら</b>）COP.COND<br>
+          　tara（食べ<b>たら</b>）PST.COND<br>
+          　ba（食べれ<b>ば</b>）COND<br>
+          <b style="color:var(--blu)">Cjc</b> ⚡ = 推量<br>
+          　daroo（きれい<b>だろう</b>）COP.CJC<br>
+          <b style="color:var(--blu)">Opt</b> = 意志<br>
+          <b style="color:var(--blu)">Des</b> = 希望<br>
+          <b style="color:var(--blu)">Pot</b> = 可能<br>
+          <b style="color:var(--blu)">Imp</b> = 命令<br>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:10px;border-top:1px solid var(--bd);padding-top:8px">
+      <div style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:.62rem;color:var(--acc);font-weight:600;margin-bottom:4px">NEG/COP パラダイム比較（語幹特性 + 活用語尾）</div>
+      <div style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:.68rem;color:var(--fg2);line-height:1.8;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div>
+          <b style="color:var(--acc)">COP だ系:</b><br>
+          da = COP-PRS → <span style="color:var(--grn)">Tense=Pres</span><br>
+          daQ-ta = COP-PST → <span style="color:var(--grn)">Tense=Past</span><br>
+          daro-u = COP-CJC → <span style="color:var(--grn)">Mood=Cjc</span><br>
+          na = COP.ADN → <span style="color:var(--grn)">VerbForm=Part</span><br>
+          nara = COP.COND → <span style="color:var(--grn)">Mood=Cnd</span><br>
+          de = COP.GER → <span style="color:var(--grn)">VerbForm=Conv</span><br>
+          ni = COP.ADV → <span style="color:var(--grn)">VerbForm=Conv</span><br>
+        </div>
+        <div>
+          <b style="color:var(--red)">NEG ない系:</b><br>
+          na-i = NEG-PRS → <span style="color:var(--grn)">Pol=Neg|Tense=Pres</span><br>
+          na-kaQ-ta = NEG-PST → <span style="color:var(--grn)">Pol=Neg|Tense=Past</span><br>
+          na-kereba = NEG-COND → <span style="color:var(--grn)">Pol=Neg|Mood=Cnd</span><br>
+          na-ku-te = NEG-GER → <span style="color:var(--grn)">Pol=Neg|VF=Conv</span><br>
+          na-i-de = NEG-PRS-GER → <span style="color:var(--grn)">Pol=Neg|T=Pres|VF=Conv</span><br>
+        </div>
+      </div>
+      <div style="margin-top:6px;font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:.6rem;color:var(--fg3)">
+        原則: 語幹(da-/na-)が語彙カテゴリ(COP/NEG)を担い、活用語尾(-i/-ta/-roo等)がTense/Mood/VerbFormを担う。一語に共存。
+      </div>
+    </div>
+    <div style="margin-top:10px;border-top:1px solid var(--bd);padding-top:8px">
+      <div style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:.62rem;color:var(--acc);font-weight:600;margin-bottom:4px">依存構造: COP否定 (v2)</div>
+      <div style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:.68rem;color:var(--fg2);line-height:1.8">
+        きれいではない: kiree <span style="color:var(--blu)">de</span> wa <span style="color:var(--red)">na-i</span><br>
+        　kiree ←<span style="color:var(--blu)">cop</span>── de ←<span style="color:var(--grn)">case</span>── wa<br>
+        　　　　　　　 de ←<span style="color:var(--red)">aux</span>── na-i<br>
+        <span style="color:var(--fg3)">copは常にだ系(de)が担い、ない系はauxとしてcopに従属</span>
+      </div>
+    </div>
+    <div style="margin-top:10px;border-top:1px solid var(--bd);padding-top:8px">
+      <div style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:.62rem;color:var(--acc);font-weight:600;margin-bottom:4px">個別グロス → feats 早見表</div>
+      <div style="font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:.68rem;color:var(--fg2);line-height:1.7;column-count:3;column-gap:16px">
+        PRS → Tense=Pres<br>
+        PST → Tense=Past<br>
+        NEG → Polarity=Neg<br>
+        POL → Polite=Form<br>
+        PASS → Voice=Pass<br>
+        CAUS → Voice=Cau<br>
+        PROG → Aspect=Prog<br>
+        PERF → Aspect=Perf<br>
+        EVID → Evident=Nfh<br>
+        COL → Style=Coll<br>
+        TOP → (case) <br>
+        NOM/ACC/DAT/GEN → Case=*<br>
+      </div>
+    </div>
+    <div style="margin-top:8px;padding:6px 10px;background:var(--bg);border-radius:var(--r);font-family:&#39;IBM Plex Mono&#39;,monospace;font-size:.62rem;color:var(--fg3);line-height:1.7">
+      <b style="color:var(--pink)">設計原則:</b> Conv=副詞的接続形（て/で/に）、Cnd=条件（なら/たら/ば）。条件はConvではない（トルコ語UD準拠）。<br>
+      <b style="color:var(--pink)">⚡拡張:</b> Mood=Cjc（推量）はUDコアにないが、言語固有拡張として定義。
+    </div>
+  </details>
+  <div class="nav-row">
+    <button class="nav-btn" onclick="navPrev()" disabled="">← 前</button>
+    <button class="nav-btn done-btn" onclick="toggleDone()">✓ 完了済</button>
+    <button class="nav-btn" onclick="navNext()">次 →</button></div>
+  <div style="margin-top:16px;padding-top:8px;border-top:1px solid var(--bd)">
+    <div class="progress-info"><span>全体: 100/165</span><span>バッチ: 3/5</span></div></div>
+  </div>
+
+<script>
+// ═══════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════
+const UPOS_LIST=["NOUN","PROPN","VERB","ADJ","ADV","ADP","AUX","SCONJ","CCONJ","PART","DET","NUM","PRON","INTJ","PUNCT","SYM","X"];
+const DEPREL_LIST=["root","nsubj","obj","iobj","obl","nmod","case","mark","cop","aux","advmod","amod","acl","advcl","det","nummod","compound","flat","fixed","conj","cc","discourse","dep","punct","csubj","ccomp","xcomp","vocative","appos","dislocated","parataxis"];
+// ═══════════════════════════════════
+// UD FEATURES — Complete inventory from universaldependencies.org/u/feat/
+// Structure: { category_label: { Feature: [Values] } }
+// ═══════════════════════════════════
+const UD_FEATS_GROUPED={
+  "活用形 Inflectional:Verbal":{
+    VerbForm:["Conv","Fin","Gdv","Ger","Inf","Part","Sup","Vnoun"],
+    Mood:["Adm","Cjc","Cnd","Des","Imp","Ind","Int","Irr","Jus","Nec","Opt","Pot","Prp","Qot","Sub"],
+    Tense:["Fut","Imp","Past","Pqp","Pres"],
+    Aspect:["Hab","Imp","Iter","Perf","Prog","Prosp"],
+    Voice:["Act","Antip","Bfoc","Cau","Dir","Inv","Lfoc","Mid","Pass","Rcp"],
+    Evident:["Fh","Nfh"],
+    Polarity:["Neg","Pos"],
+    Person:["0","1","2","3","4"],
+    Polite:["Elev","Form","Humb","Infm"],
+    Clusivity:["Ex","In"]
+  },
+  "格・名詞性 Inflectional:Nominal":{
+    Case:["Abe","Abl","Abs","Acc","Add","Ade","All","Ant","Ass","Ben","Cau","Cmp","Cns","Com","Dat","Del","Dir","Dis","Dst","Ela","Equ","Erg","Ess","Fac","Gen","Ill","Ine","Ins","Lat","Loc","Mot","Nom","Obl","Par","Per","Pri","Pro","Prp","Sbe","Sbl","Spe","Spl","Sup","Tem","Ter","Tra","Voc"],
+    Gender:["Com","Fem","Masc","Neut"],
+    Animacy:["Anim","Hum","Inan","Nhum"],
+    Number:["Coll","Count","Dual","Grpa","Grpl","Inv","Pauc","Plur","Ptan","Sing","Tri"],
+    Definite:["Com","Cons","Def","Ind","Spec"],
+    Degree:["Abs","Aug","Cmp","Dim","Equ","Pos","Sup"],
+    Deixis:["Abv","Bel","Even","Med","Nvis","Prox","Remt"],
+    DeixisRef:["1","2"],
+    NounClass:["_CUSTOM_"]
+  },
+  "語彙的 Lexical":{
+    PronType:["Art","Dem","Emp","Exc","Ind","Int","Neg","Prs","Rcp","Rel","Tot"],
+    NumType:["Card","Dist","Frac","Mult","Ord","Range","Sets"],
+    Poss:["Yes"],
+    Reflex:["Yes"]
+  },
+  "その他 Other":{
+    Abbr:["Yes"],
+    Typo:["Yes"],
+    Foreign:["Yes"],
+    ExtPos:["ADJ","ADP","ADV","AUX","CCONJ","DET","INTJ","NOUN","NUM","PART","PRON","PROPN","SCONJ","VERB"]
+  },
+  "言語固有 Language-Specific":{
+    Style:["Arch","Coll","Expr","Form","Rare","Slng","Vrnc"],
+    NameType:["Geo","Giv","Oth","Prs","Sur"],
+    NumForm:["Digit","Roman","Word"],
+    InflClass:["_CUSTOM_"]
+  }
+};
+// Build flat array for backwards compat + generate Feature=Value pairs
+const UD_FEATS=[];
+for(const[cat,feats] of Object.entries(UD_FEATS_GROUPED)){
+  for(const[feat,vals] of Object.entries(feats)){
+    vals.forEach(v=>{if(v!=="_CUSTOM_")UD_FEATS.push(feat+"="+v)});
+  }
+}
+// Language-specific extensions (not in UD core, documented for UDJ v2)
+const CUSTOM_FEATS=new Set(["Mood=Cjc","VerbForm=Thm"]);
+
+const G2F={"COP":"_COP","COP.PRS":"Tense=Pres","COP.FIN":"VerbForm=Fin","COP.ADN":"VerbForm=Part","COP.ADV":"VerbForm=Conv","COP.GER":"VerbForm=Conv","COP.COND":"Mood=Cnd","COP.CND":"Mood=Cnd","COP.POL":"Polite=Form","COP.CJC":"Mood=Cjc","PRS":"Tense=Pres","PST":"Tense=Past","NPST":"Tense=Pres","FIN":"VerbForm=Fin","ADN":"VerbForm=Part","INF":"VerbForm=Inf","GER":"VerbForm=Conv","CND":"Mood=Cnd","COND":"Mood=Cnd","CJC":"Mood=Cjc","PRSM":"Mood=Pot","VOL":"Mood=Opt","IMP":"Mood=Imp","DES":"Mood=Des","NEC":"Mood=Nec","NEG":"Polarity=Neg","POL":"Polite=Form","PASS":"Voice=Pass","CAUS":"Voice=Cau","PROG":"Aspect=Prog","PERF":"Aspect=Perf","PROSP":"Aspect=Prosp","EVID":"Evident=Nfh","COL":"Style=Coll","TOP":"_TOP","NOM":"Case=Nom","ACC":"Case=Acc","DAT":"Case=Dat","GEN":"Case=Gen","LOC":"Case=Loc","LAT":"Case=Lat","ABL":"Case=Abl","COM":"Case=Com","INS":"Case=Ins","SEQ":"VerbForm=Conv","THM":"VerbForm=Thm","HON":"Polite=Elev","HUM":"Polite=Humb","INFR":"Evident=Nfh","HRSY":"Evident=Nfh"};
+// Compound gloss patterns: splitter handles these via - but listed here for documentation
+// NEG-PRS (na-i)     → Polarity=Neg + Tense=Pres  (語幹NEG + 活用PRS)
+// NEG-PST (na-kaQ-ta)→ Polarity=Neg + Tense=Past  (語幹NEG + 活用PST)
+// NEG-COND (na-kereba) → Polarity=Neg + Mood=Cnd
+// NEG-GER (na-ku-te) → Polarity=Neg + VerbForm=Conv
+// NEG.SEQ (naide)    → Polarity=Neg + VerbForm=Conv  (allomorph of NEG-GER)
+// COP-PST (daQ-ta)   → Tense=Past   (COP is structural, PST from 活用)
+// COP-CJC (daro-u)   → Mood=Cjc
+const STRUCTURAL=new Set(["COP","_COP","TOP","_TOP","LV","QUOT","COMP","NMLZ","CONJ","EMPH","FOC","Q","SFP","ADVL","UCPRF","BEN"]);
+
+function glossToWordFeats(g){
+  if(!g)return[];const fs=[];
+  g.replace(/[()]/g,"").split(/[-.\\/]/).forEach(p=>{const u=p.trim().toUpperCase();const f=G2F[u];if(f&&!f.startsWith("_")&&!fs.includes(f))fs.push(f)});
+  return[...new Set(fs)].sort();
+}
+function autoUpos(g){
+  if(!g)return null;const f=g.split(/[-.\\/]/)[0].trim();const u=f.toUpperCase();
+  if(u.startsWith("COP"))return"AUX";
+  if(["TOP","NOM","ACC","DAT","GEN","LOC","LAT","ABL","COM","INS","CNTR"].includes(u))return"ADP";
+  if(["NEG","PST","PRS","PASS","CAUS","POL","DES","PROG","PERF","VOL","PRSM","CJC","EVID","PROSP","NEC","IMP"].includes(u))return"AUX";
+  if(["COMP","NMLZ","PURP","REAS","COND","CND","SEQ"].includes(u))return"SCONJ";
+  if(["Q","SFP","FOC","EMPH"].includes(u))return"PART";
+  if(["CONJ","ADVRS"].includes(u))return"CCONJ";
+  if(f.length>1&&f[0]===f[0].toUpperCase()&&f.slice(1)===f.slice(1).toLowerCase())return"PROPN";
+  return null;
+}
+function autoDeprel(g,upos){
+  if(upos==="ADP")return"case";if(upos==="SCONJ")return"mark";if(upos==="CCONJ")return"cc";if(upos==="PART")return"mark";
+  if(upos==="AUX"){const u=(g||"").toUpperCase();return u.startsWith("COP")?"cop":"aux";}
+  return null;
+}
+
+// ═══════════════════════════════════
+// DATA
+// ═══════════════════════════════════
+const BATCHES=[
+{id:"cop_da",label:"COP「だ」系",items:[
+{id:"cop1",suw:["だ"],udj:["花子","は","きれい","だ"],example:"花子はきれいだ",note:"終止形"},
+{id:"cop2",suw:["だっ","た"],udj:["花子","は","きれい","だっ","た"],example:"花子はきれいだった",note:"過去"},
+{id:"cop3",suw:["だっ","たら"],udj:["きれい","だっ","たら","買う"],example:"きれいだったら買う",note:"過去条件"},
+{id:"cop4",suw:["だろ","う"],udj:["きれい","だろ","う"],example:"きれいだろう",note:"推量"},
+{id:"cop5",suw:["な"],udj:["きれい","な","花"],example:"きれいな花",note:"連体形"},
+{id:"cop6",suw:["なら"],udj:["きれい","なら","買う"],example:"きれいなら買う",note:"条件"},
+{id:"cop7",suw:["で"],udj:["きれい","で","安い"],example:"きれいで安い",note:"中止形"},
+{id:"cop8",suw:["に"],udj:["きれい","に","飾る"],example:"きれいに飾る",note:"副詞形"},
+{id:"cop9",suw:["で","は","ない"],udj:["きれい","で","は","ない"],example:"きれいではない",note:"否定"},
+{id:"cop10",suw:["で","は","なかっ","た"],udj:["きれい","で","は","なかっ","た"],example:"きれいではなかった",note:"否定過去"},
+{id:"cop11",suw:["で","は","あり","ませ","ん"],udj:["きれい","で","は","あり","ませ","ん"],example:"きれいではありません",note:"丁寧否定"},
+{id:"cop12",suw:["で","は","あり","ませ","ん","でし","た"],udj:["きれい","で","は","あり","ませ","ん","でし","た"],example:"きれいではありませんでした",note:"丁寧否定過去"},
+{id:"cop13",suw:["で","ある"],udj:["きれい","で","ある"],example:"きれいである",note:"書き言葉COP"},
+{id:"cop14",suw:["で","あっ","た"],udj:["きれい","で","あっ","た"],example:"きれいであった",note:"書き言葉過去"},
+{id:"cop15",suw:["で","も","ある"],udj:["きれい","で","も","ある"],example:"きれいでもある",note:"並列COP"}
+]},
+{id:"desu",label:"COP「です」系",items:[
+{id:"desu1",suw:["です"],udj:["花子","は","きれい","です"],example:"花子はきれいです",note:"丁寧終止"},
+{id:"desu2",suw:["でし","た"],udj:["花子","は","きれい","でし","た"],example:"花子はきれいでした",note:"丁寧過去"},
+{id:"desu3",suw:["でしょ","う"],udj:["きれい","でしょ","う"],example:"きれいでしょう",note:"丁寧推量"}
+]},
+{id:"v_aux",label:"動詞+AUX",items:[
+{id:"vaux1",suw:["た"],udj:["花子","が","食べ","た"],example:"花子が食べた",note:"過去"},
+{id:"vaux2",suw:["たら"],udj:["食べ","たら","帰る"],example:"食べたら帰る",note:"条件"},
+{id:"vaux3",suw:["ない"],udj:["食べ","ない"],example:"食べない",note:"否定"},
+{id:"vaux4",suw:["なかっ","た"],udj:["食べ","なかっ","た"],example:"食べなかった",note:"否定過去"},
+{id:"vaux5",suw:["なけれ","ば"],udj:["食べ","なけれ","ば"],example:"食べなければ",note:"否定条件"},
+{id:"vaux6",suw:["ます"],udj:["食べ","ます"],example:"食べます",note:"丁寧"},
+{id:"vaux7",suw:["まし","た"],udj:["食べ","まし","た"],example:"食べました",note:"丁寧過去"},
+{id:"vaux8",suw:["ませ","ん"],udj:["食べ","ませ","ん"],example:"食べません",note:"丁寧否定"},
+{id:"vaux9",suw:["ませ","ん","でし","た"],udj:["食べ","ませ","ん","でし","た"],example:"食べませんでした",note:"丁寧否定過去"},
+{id:"vaux10",suw:["たい"],udj:["食べ","たい"],example:"食べたい",note:"希望"},
+{id:"vaux11",suw:["たかっ","た"],udj:["食べ","たかっ","た"],example:"食べたかった",note:"希望過去"},
+{id:"vaux12",suw:["られる"],udj:["食べ","られる"],example:"食べられる",note:"受身/可能"},
+{id:"vaux13",suw:["られ","た"],udj:["食べ","られ","た"],example:"食べられた",note:"受身過去"},
+{id:"vaux14",suw:["させる"],udj:["食べ","させる"],example:"食べさせる",note:"使役"},
+{id:"vaux15",suw:["させ","た"],udj:["食べ","させ","た"],example:"食べさせた",note:"使役過去"},
+{id:"vaux16",suw:["させ","られ","た"],udj:["食べ","させ","られ","た"],example:"食べさせられた",note:"使役受身過去"}
+]},
+{id:"v_complex",label:"動詞 複合",items:[
+{id:"vc1a",suw:["ない","で"],udj:["食べ","ない","で","返す"],example:"食べないで返した",note:"否定連用（副詞節）",ctx:"advcl"},
+{id:"vc1b",suw:["ない","で"],udj:["食べ","ない","で"],example:"食べないで！",note:"禁止（文末）",ctx:"prohib"},
+{id:"vc2",suw:["なく","て"],udj:["食べ","なく","て"],example:"食べなくて",note:"否定て形"},
+{id:"vc3",suw:["ず","に"],udj:["食べ","ず","に"],example:"食べずに",note:"否定連用(文語)"},
+{id:"vc4",suw:["たく","ない"],udj:["食べ","たく","ない"],example:"食べたくない",note:"希望否定"},
+{id:"vc5",suw:["たく","なかっ","た"],udj:["食べ","たく","なかっ","た"],example:"食べたくなかった",note:"希望否定過去"},
+{id:"vc6",suw:["られ","ない"],udj:["食べ","られ","ない"],example:"食べられない",note:"可能否定"},
+{id:"vc7",suw:["ましょ","う"],udj:["食べ","ましょ","う"],example:"食べましょう",note:"丁寧意志"}
+]},
+{id:"te_compound",label:"て形複合",items:[
+{id:"te1",suw:["て","いる"],udj:["食べ","て","いる"],example:"食べている",note:"進行/結果"},
+{id:"te2",suw:["て","い","た"],udj:["食べ","て","い","た"],example:"食べていた",note:"進行過去"},
+{id:"te3",suw:["て","い","ます"],udj:["食べ","て","い","ます"],example:"食べています",note:"進行丁寧"},
+{id:"te4",suw:["て","い","ない"],udj:["食べ","て","い","ない"],example:"食べていない",note:"進行否定"},
+{id:"te5",suw:["て","しまう"],udj:["食べ","て","しまう"],example:"食べてしまう",note:"完了"},
+{id:"te6",suw:["て","しまっ","た"],udj:["食べ","て","しまっ","た"],example:"食べてしまった",note:"完了過去"},
+{id:"te7",suw:["て","くる"],udj:["食べ","て","くる"],example:"食べてくる",note:"接近"},
+{id:"te8",suw:["て","いく"],udj:["食べ","て","いく"],example:"食べていく",note:"推移"},
+{id:"te9",suw:["て","くれる"],udj:["食べ","て","くれる"],example:"食べてくれる",note:"授受(話者へ)"},
+{id:"te10",suw:["て","もらう"],udj:["食べ","て","もらう"],example:"食べてもらう",note:"授受(受益)"},
+{id:"te11",suw:["て","おく"],udj:["食べ","て","おく"],example:"食べておく",note:"準備"},
+{id:"te12",suw:["て","みる"],udj:["食べ","て","みる"],example:"食べてみる",note:"試行"},
+{id:"te13",suw:["て","ください"],udj:["食べ","て","ください"],example:"食べてください",note:"丁寧依頼"},
+{id:"te14",suw:["て","ある"],udj:["食べ","て","ある"],example:"食べてある",note:"結果状態"},
+{id:"te15",suw:["て","あげる"],udj:["食べ","て","あげる"],example:"食べてあげる",note:"授受(他者へ)"}
+]},
+{id:"adj_i",label:"い形容詞 基本",items:[
+{id:"adj1",suw:["高い"],udj:["高い"],example:"高い",note:"終止形"},
+{id:"adj2",suw:["高かっ","た"],udj:["高かっ","た"],example:"高かった",note:"過去"},
+{id:"adj3",suw:["高く","ない"],udj:["高く","ない"],example:"高くない",note:"否定"},
+{id:"adj4",suw:["高く","なかっ","た"],udj:["高く","なかっ","た"],example:"高くなかった",note:"否定過去"},
+{id:"adj5",suw:["高けれ","ば"],udj:["高けれ","ば","買う"],example:"高ければ買う",note:"条件"},
+{id:"adj6",suw:["高く","て"],udj:["高く","て","安い"],example:"高くて安い",note:"て形接続"},
+{id:"adj7",suw:["高く"],udj:["高く","飾る"],example:"高く飾る",note:"副詞形"},
+{id:"adj8",suw:["高い"],udj:["高い","花"],example:"高い花",note:"連体形"}
+]},
+{id:"adj_ext",label:"い形容詞 拡張",items:[
+{id:"adje1",suw:["高","そう","だ"],udj:["高","そう","だ"],example:"高そうだ",note:"様態"},
+{id:"adje2",suw:["高","すぎる"],udj:["高","すぎる"],example:"高すぎる",note:"過度"},
+{id:"adje3",suw:["高く","なる"],udj:["高く","なる"],example:"高くなる",note:"変化"},
+{id:"adje4",suw:["高く","する"],udj:["高く","する"],example:"高くする",note:"使役的変化"},
+{id:"adje5",suw:["高","さ"],udj:["高","さ"],example:"高さ",note:"名詞化(-さ)"},
+{id:"adje6",suw:["高","み"],udj:["高","み"],example:"高み",note:"名詞化(-み)"}
+]},
+{id:"noun_pred",label:"名詞述語",items:[
+{id:"np1",suw:["学生","だ"],udj:["花子","は","学生","だ"],example:"花子は学生だ",note:"名詞+COP"},
+{id:"np2",suw:["学生","です"],udj:["花子","は","学生","です"],example:"花子は学生です",note:"名詞+COP丁寧"},
+{id:"np3",suw:["学生","で","は","ない"],udj:["花子","は","学生","で","は","ない"],example:"花子は学生ではない",note:"名詞+COP否定"},
+{id:"np4",suw:["学生","だっ","た"],udj:["花子","は","学生","だっ","た"],example:"花子は学生だった",note:"名詞+COP過去"},
+{id:"np5",suw:["学生","でし","た"],udj:["花子","は","学生","でし","た"],example:"花子は学生でした",note:"名詞+COP丁寧過去"},
+{id:"np6",suw:["学生","に","なる"],udj:["学生","に","なる"],example:"学生になる",note:"変化"}
+]},
+{id:"v_ishi",label:"意志・命令・禁止",items:[
+{id:"ishi1",suw:["食べ","よう"],udj:["食べ","よう"],example:"食べよう",note:"意志"},
+{id:"ishi2",suw:["食べ","まい"],udj:["食べ","まい"],example:"食べまい",note:"否定意志"},
+{id:"ishi3",suw:["食べろ"],udj:["食べろ"],example:"食べろ",note:"命令"},
+{id:"ishi4",suw:["食べ","なさい"],udj:["食べ","なさい"],example:"食べなさい",note:"丁寧命令"},
+{id:"ishi5",suw:["食べる","な"],udj:["食べる","な"],example:"食べるな",note:"禁止"}
+]},
+{id:"v_joken",label:"条件形",items:[
+{id:"joken1",suw:["食べれ","ば"],udj:["食べれ","ば","帰る"],example:"食べれば帰る",note:"ば条件"},
+{id:"joken2",suw:["食べる","と"],udj:["食べる","と","帰る"],example:"食べると帰る",note:"と条件"}
+]},
+{id:"setsuzoku",label:"接続助詞",items:[
+{id:"setsu1",suw:["食べる","から"],udj:["食べる","から","帰る"],example:"食べるから帰る",note:"理由"},
+{id:"setsu2",suw:["食べる","ので"],udj:["食べる","ので","帰る"],example:"食べるので帰る",note:"理由(丁寧)"},
+{id:"setsu3",suw:["食べる","のに"],udj:["食べる","のに","帰る"],example:"食べるのに帰る",note:"逆接"},
+{id:"setsu4",suw:["食べる","けど"],udj:["食べる","けど","帰る"],example:"食べるけど帰る",note:"逆接(口語)"},
+{id:"setsu5",suw:["食べる","が"],udj:["食べる","が","帰る"],example:"食べるが帰る",note:"逆接(文語)"},
+{id:"setsu6",suw:["食べる","し"],udj:["食べる","し","飲む"],example:"食べるし飲む",note:"並列"},
+{id:"setsu7",suw:["食べ","て","も"],udj:["食べ","て","も","帰る"],example:"食べても帰る",note:"譲歩"},
+{id:"setsu8",suw:["食べ","ながら"],udj:["食べ","ながら","歩く"],example:"食べながら歩く",note:"同時"},
+{id:"setsu9",suw:["食べ","たり"],udj:["食べ","たり","飲ん","だり","する"],example:"食べたり飲んだりする",note:"例示"},
+{id:"setsu10",suw:["食べ","た","もの","の"],udj:["食べ","た","もの","の","帰る"],example:"食べたものの帰る",note:"逆接(ものの)"},
+{id:"setsu11",suw:["食べる","に","も","かかわら","ず"],udj:["食べる","に","も","かかわら","ず","帰る"],example:"食べるにもかかわらず帰る",note:"逆接"},
+{id:"setsu12",suw:["食べる","と","し","て","も"],udj:["食べる","と","し","て","も","帰る"],example:"食べるとしても帰る",note:"仮定譲歩(としても)"},
+{id:"setsu13",suw:["食べる","に","し","て","も"],udj:["食べる","に","し","て","も","帰る"],example:"食べるにしても帰る",note:"仮定譲歩(にしても)"},
+{id:"setsu14",suw:["食べる","と","は","いえ"],udj:["食べる","と","は","いえ","帰る"],example:"食べるとはいえ帰る",note:"逆接(とはいえ)"}
+]},
+{id:"noda",label:"のだ/のです系",items:[
+{id:"noda1",suw:["食べる","の","だ"],udj:["食べる","の","だ"],example:"食べるのだ",note:"説明"},
+{id:"noda2",suw:["食べる","の","です"],udj:["食べる","の","です"],example:"食べるのです",note:"説明(丁寧)"},
+{id:"noda3",suw:["食べ","た","の","だ"],udj:["食べ","た","の","だ"],example:"食べたのだ",note:"説明(過去)"},
+{id:"noda4",suw:["食べる","ん","だ"],udj:["食べる","ん","だ"],example:"食べるんだ",note:"縮約"},
+{id:"noda5",suw:["食べ","ない","の","だ"],udj:["食べ","ない","の","だ"],example:"食べないのだ",note:"否定+説明"},
+{id:"noda6",suw:["食べる","の","で","は","ない"],udj:["食べる","の","で","は","ない"],example:"食べるのではない",note:"否定"},
+{id:"noda7",suw:["食べる","の","で","ある"],udj:["食べる","の","で","ある"],example:"食べるのである",note:"文語"},
+{id:"noda8",suw:["食べる","の","でしょう"],udj:["食べる","の","でしょう"],example:"食べるのでしょう",note:"推量"},
+{id:"noda9",suw:["食べる","ん","じゃ","ない"],udj:["食べる","ん","じゃ","ない"],example:"食べるんじゃない",note:"縮約否定"}
+]},
+{id:"gimu",label:"義務・許可",items:[
+{id:"gimu1",suw:["食べ","なけれ","ば","なら","ない"],udj:["食べ","なけれ","ば","なら","ない"],example:"食べなければならない",note:"義務"},
+{id:"gimu2",suw:["食べ","なく","て","は","いけ","ない"],udj:["食べ","なく","て","は","いけ","ない"],example:"食べなくてはいけない",note:"義務(口語)"},
+{id:"gimu3",suw:["食べ","なく","て","も","いい"],udj:["食べ","なく","て","も","いい"],example:"食べなくてもいい",note:"不要"},
+{id:"gimu4",suw:["食べ","て","も","いい"],udj:["食べ","て","も","いい"],example:"食べてもいい",note:"許可"},
+{id:"gimu5",suw:["食べる","べき","だ"],udj:["食べる","べき","だ"],example:"食べるべきだ",note:"当為"},
+{id:"gimu6",suw:["食べ","て","は","なら","ない"],udj:["食べ","て","は","なら","ない"],example:"食べてはならない",note:"禁止"},
+{id:"gimu7",suw:["食べ","なく","て","は","なら","ない"],udj:["食べ","なく","て","は","なら","ない"],example:"食べなくてはならない",note:"義務(なくては)"},
+{id:"gimu8",suw:["食べ","ざる","を","え","ない"],udj:["食べ","ざる","を","え","ない"],example:"食べざるをえない",note:"不可避"},
+{id:"gimu9",suw:["食べ","ない","で","は","い","られ","ない"],udj:["食べ","ない","で","は","い","られ","ない"],example:"食べないではいられない",note:"抑制不能"},
+{id:"gimu10",suw:["食べれ","ば","いい"],udj:["食べれ","ば","いい"],example:"食べればいい",note:"助言(ば)"},
+{id:"gimu11",suw:["食べ","たら","いい"],udj:["食べ","たら","いい"],example:"食べたらいい",note:"助言(たら)"}
+]},
+{id:"modariti",label:"モダリティ表現",items:[
+{id:"mod1",suw:["食べる","か","も","しれ","ない"],udj:["食べる","か","も","しれ","ない"],example:"食べるかもしれない",note:"可能性"},
+{id:"mod2",suw:["食べる","に","ちがい","ない"],udj:["食べる","に","ちがい","ない"],example:"食べるにちがいない",note:"確信"},
+{id:"mod3",suw:["食べ","た","らしい"],udj:["食べ","た","らしい"],example:"食べたらしい",note:"推定"},
+{id:"mod4",suw:["食べ","た","そう","だ"],udj:["食べ","た","そう","だ"],example:"食べたそうだ",note:"伝聞"},
+{id:"mod5",suw:["食べる","みたい","だ"],udj:["食べる","みたい","だ"],example:"食べるみたいだ",note:"推量(口語)"},
+{id:"mod6",suw:["食べ","て","ほしい"],udj:["食べ","て","ほしい"],example:"食べてほしい",note:"希望(他者)"},
+{id:"mod7",suw:["食べる","はず","だ"],udj:["食べる","はず","だ"],example:"食べるはずだ",note:"当然"},
+{id:"mod8",suw:["食べる","わけ","が","ない"],udj:["食べる","わけ","が","ない"],example:"食べるわけがない",note:"不可能"},
+{id:"mod9",suw:["食べる","よう","だ"],udj:["食べる","よう","だ"],example:"食べるようだ",note:"推量(よう)"},
+{id:"mod10",suw:["食べ","そう","だ"],udj:["食べ","そう","だ"],example:"食べそうだ",note:"様態"},
+{id:"mod11",suw:["食べる","に","すぎ","ない"],udj:["食べる","に","すぎ","ない"],example:"食べるにすぎない",note:"限定(にすぎない)"},
+{id:"mod12",suw:["食べる","しか","ない"],udj:["食べる","しか","ない"],example:"食べるしかない",note:"限定(しかない)"},
+{id:"mod13",suw:["食べる","か","も","しれ","ませ","ん"],udj:["食べる","か","も","しれ","ませ","ん"],example:"食べるかもしれません",note:"可能性(丁寧)"},
+{id:"mod14",suw:["食べる","わけ","で","は","ない"],udj:["食べる","わけ","で","は","ない"],example:"食べるわけではない",note:"部分否定"}
+]},
+{id:"keishiki",label:"形式名詞構文",items:[
+{id:"kei1",suw:["食べる","ところ","だ"],udj:["食べる","ところ","だ"],example:"食べるところだ",note:"局面"},
+{id:"kei2",suw:["食べる","つもり","だ"],udj:["食べる","つもり","だ"],example:"食べるつもりだ",note:"意図"},
+{id:"kei3",suw:["食べる","こと","が","できる"],udj:["食べる","こと","が","できる"],example:"食べることができる",note:"可能"},
+{id:"kei4",suw:["食べる","よう","に","する"],udj:["食べる","よう","に","する"],example:"食べるようにする",note:"目的"},
+{id:"kei5",suw:["食べ","よう","と","する"],udj:["食べ","よう","と","する"],example:"食べようとする",note:"試み"},
+{id:"kei6",suw:["食べ","た","こと","が","ある"],udj:["食べ","た","こと","が","ある"],example:"食べたことがある",note:"経験"},
+{id:"kei7",suw:["食べる","こと","に","する"],udj:["食べる","こと","に","する"],example:"食べることにする",note:"決定"},
+{id:"kei8",suw:["食べる","こと","に","なる"],udj:["食べる","こと","に","なる"],example:"食べることになる",note:"結果"},
+{id:"kei9",suw:["食べる","こと","は","ない"],udj:["食べる","こと","は","ない"],example:"食べることはない",note:"不要"},
+{id:"kei10",suw:["食べる","こと","も","ある"],udj:["食べる","こと","も","ある"],example:"食べることもある",note:"可能性(頻度)"},
+{id:"kei11",suw:["食べる","こと","が","多い"],udj:["食べる","こと","が","多い"],example:"食べることが多い",note:"頻度"},
+{id:"kei12",suw:["食べ","た","ため","だ"],udj:["食べ","た","ため","だ"],example:"食べたためだ",note:"理由(ため)"},
+{id:"kei13",suw:["食べる","よう","に","なる"],udj:["食べる","よう","に","なる"],example:"食べるようになる",note:"変化(ようになる)"}
+]},
+{id:"kaku",label:"格助詞",items:[
+{id:"kaku1",suw:["花子","が"],udj:["花子","が","来","た"],example:"花子が来た",note:"主格"},
+{id:"kaku2",suw:["花子","を"],udj:["花子","を","見","た"],example:"花子を見た",note:"対格"},
+{id:"kaku3",suw:["花子","に"],udj:["花子","に","会っ","た"],example:"花子に会った",note:"与格/着点"},
+{id:"kaku4",suw:["東京","へ"],udj:["東京","へ","行く"],example:"東京へ行く",note:"方向"},
+{id:"kaku5",suw:["東京","で"],udj:["東京","で","食べる"],example:"東京で食べる",note:"場所/手段"},
+{id:"kaku6",suw:["花子","と"],udj:["花子","と","行く"],example:"花子と行く",note:"共格"},
+{id:"kaku7",suw:["東京","から"],udj:["東京","から","来","た"],example:"東京から来た",note:"起点"},
+{id:"kaku8",suw:["東京","まで"],udj:["東京","まで","行く"],example:"東京まで行く",note:"終点"},
+{id:"kaku9",suw:["花子","より"],udj:["花子","より","高い"],example:"花子より高い",note:"比較"},
+{id:"kaku10",suw:["花子","の"],udj:["花子","の","本"],example:"花子の本",note:"属格"}
+]},
+{id:"toritate",label:"とりたて助詞",items:[
+{id:"tori1",suw:["花子","は"],udj:["花子","は","来","た"],example:"花子は来た",note:"主題"},
+{id:"tori2",suw:["花子","も"],udj:["花子","も","来","た"],example:"花子も来た",note:"添加"},
+{id:"tori3",suw:["花子","さえ"],udj:["花子","さえ","来","た"],example:"花子さえ来た",note:"極限"},
+{id:"tori4",suw:["花子","だけ"],udj:["花子","だけ","来","た"],example:"花子だけ来た",note:"限定"},
+{id:"tori5",suw:["花子","しか"],udj:["花子","しか","来","ない"],example:"花子しか来ない",note:"限定(否定)"},
+{id:"tori6",suw:["花子","ばかり"],udj:["花子","ばかり","来る"],example:"花子ばかり来る",note:"偏り"},
+{id:"tori7",suw:["花子","ほど"],udj:["花子","ほど","高い"],example:"花子ほど高い",note:"程度"},
+{id:"tori8",suw:["花子","など"],udj:["花子","など","来","た"],example:"花子など来た",note:"例示"}
+]},
+{id:"keigo",label:"敬語",items:[
+{id:"keigo1",suw:["召し上がる"],udj:["召し上がる"],example:"召し上がる",note:"尊敬動詞(終止)"},
+{id:"keigo2",suw:["召し上がっ","た"],udj:["召し上がっ","た"],example:"召し上がった",note:"尊敬動詞(過去)"},
+{id:"keigo3",suw:["いたす"],udj:["いたす"],example:"いたす",note:"謙譲動詞(終止)"},
+{id:"keigo4",suw:["いたし","ます"],udj:["いたし","ます"],example:"いたします",note:"謙譲動詞(丁寧)"},
+{id:"keigo5",suw:["おっしゃる"],udj:["おっしゃる"],example:"おっしゃる",note:"尊敬動詞(言う)"},
+{id:"keigo6",suw:["お","食べ","に","なる"],udj:["お","食べ","に","なる"],example:"お食べになる",note:"尊敬構文(お〜になる)"},
+{id:"keigo7",suw:["食べ","て","いただく"],udj:["食べ","て","いただく"],example:"食べていただく",note:"謙譲授受"}
+]},
+{id:"setsuzokushi",label:"接続詞",items:[
+{id:"conj1",suw:["しかし"],udj:["しかし"],example:"しかし",note:"逆接"},
+{id:"conj2",suw:["また"],udj:["また"],example:"また",note:"添加"},
+{id:"conj3",suw:["そして"],udj:["そして"],example:"そして",note:"順接"},
+{id:"conj4",suw:["だから"],udj:["だから"],example:"だから",note:"因果"},
+{id:"conj5",suw:["しかも"],udj:["しかも"],example:"しかも",note:"累加"},
+{id:"conj6",suw:["ところが"],udj:["ところが"],example:"ところが",note:"逆接(意外)"},
+{id:"conj7",suw:["つまり"],udj:["つまり"],example:"つまり",note:"換言"},
+{id:"conj8",suw:["ただし"],udj:["ただし"],example:"ただし",note:"条件付加"},
+{id:"conj9",suw:["それに"],udj:["それに"],example:"それに",note:"添加"},
+{id:"conj10",suw:["むしろ"],udj:["むしろ"],example:"むしろ",note:"対比選択"}
+]},
+{id:"fukushi",label:"副詞",items:[
+{id:"fuku1",suw:["とても"],udj:["とても","高い"],example:"とても高い",note:"程度"},
+{id:"fuku2",suw:["まだ"],udj:["まだ","食べ","て","い","ない"],example:"まだ食べていない",note:"時間(未完)"},
+{id:"fuku3",suw:["もう"],udj:["もう","食べ","た"],example:"もう食べた",note:"時間(完了)"},
+{id:"fuku4",suw:["全く"],udj:["全く","分から","ない"],example:"全く分からない",note:"否定呼応"},
+{id:"fuku5",suw:["たぶん"],udj:["たぶん","来る"],example:"たぶん来る",note:"推量"},
+{id:"fuku6",suw:["ゆっくり"],udj:["ゆっくり","歩く"],example:"ゆっくり歩く",note:"様態"}
+]},
+{id:"shujoshi",label:"終助詞",items:[
+{id:"sfp1",suw:["食べる","よ"],udj:["食べる","よ"],example:"食べるよ",note:"主張"},
+{id:"sfp2",suw:["食べる","ね"],udj:["食べる","ね"],example:"食べるね",note:"確認"},
+{id:"sfp3",suw:["食べる","か"],udj:["食べる","か"],example:"食べるか",note:"疑問"},
+{id:"sfp4",suw:["食べる","ぞ"],udj:["食べる","ぞ"],example:"食べるぞ",note:"強調"},
+{id:"sfp5",suw:["食べる","の"],udj:["食べる","の"],example:"食べるの？",note:"質問(柔)"},
+{id:"sfp6",suw:["食べる","な","あ"],udj:["食べる","な","あ"],example:"食べるなあ",note:"詠嘆"}
+]},
+{id:"keido_doushi",label:"軽動詞構文 (サ変+する)",items:[
+{id:"lv1",suw:["する"],udj:["攻撃","する"],example:"攻撃する",note:"N+する (終止)",ctx:"敵を攻撃する。"},
+{id:"lv2",suw:["し","た"],udj:["紹介","し","た"],example:"紹介した",note:"N+した (過去)",ctx:"友人を紹介した。"},
+{id:"lv3",suw:["し","て"],udj:["利用","し","て"],example:"利用して",note:"N+して (て形)",ctx:"電車を利用して通う。"},
+{id:"lv4",suw:["し"],udj:["攻撃","し"],example:"攻撃し",note:"N+し (連用中止)",ctx:"攻撃し、退却した。"},
+{id:"lv5",suw:["さ","れる"],udj:["開催","さ","れる"],example:"開催される",note:"N+される (受身)",ctx:"大会が開催される。"},
+{id:"lv6",suw:["さ","れ","た"],udj:["紹介","さ","れ","た"],example:"紹介された",note:"N+された (受身過去)",ctx:"番組で紹介された。"},
+{id:"lv7",suw:["さ","れ","て"],udj:["発表","さ","れ","て"],example:"発表されて",note:"N+されて (受身て形)",ctx:"結果が発表されている。"},
+{id:"lv8",suw:["さ","せる"],udj:["オープン","さ","せる"],example:"オープンさせる",note:"N+させる (使役)",ctx:"店をオープンさせる。"},
+{id:"lv9",suw:["さ","せ","た"],udj:["変化","さ","せ","た"],example:"変化させた",note:"N+させた (使役過去)",ctx:"方針を変化させた。"},
+{id:"lv10",suw:["さ","せ","て"],udj:["対比","さ","せ","て"],example:"対比させて",note:"N+させて (使役て形)",ctx:"二つの色を対比させている。"},
+{id:"lv11",suw:["し","ない"],udj:["停車","し","ない"],example:"停車しない",note:"N+しない (否定)",ctx:"この駅には停車しない。"},
+{id:"lv12",suw:["し","ます"],udj:["説明","し","ます"],example:"説明します",note:"N+します (丁寧)",ctx:"以下で説明します。"},
+{id:"lv13",suw:["し","まし","た"],udj:["紹介","し","まし","た"],example:"紹介しました",note:"N+しました (丁寧過去)",ctx:"新商品を紹介しました。"},
+{id:"lv14",suw:["し","たい"],udj:["紹介","し","たい"],example:"紹介したい",note:"N+したい (願望)",ctx:"この店を紹介したい。"},
+{id:"lv15",suw:["せ","ず"],udj:["返事","せ","ず"],example:"返事せず",note:"N+せず (否定接続)",ctx:"返事せずに去った。"},
+{id:"lv16",suw:["し","て","くる"],udj:["攻撃","し","て","くる"],example:"攻撃してくる",note:"N+してくる (て形+接近)",ctx:"忍具を使って攻撃してくる。"},
+{id:"lv17",suw:["し","て","いる"],udj:["活躍","し","て","いる"],example:"活躍している",note:"N+している (て形+進行)",ctx:"第一線で活躍している。"},
+{id:"lv18",suw:["さ","れ","て","いる"],udj:["使用","さ","れ","て","いる"],example:"使用されている",note:"N+されている (受身進行)",ctx:"現在も使用されている。"}
+]}
+];
+
+// ═══════════════════════════════════
+// UDJ GOLD STANDARD (原文アノテーション)
+// [form, upos, head(1-idx,0=root), deprel, feats]
+// ═══════════════════════════════════
+const GOLD={
+// ── COP だ系（ナ形容詞=ADJ → だ is aux, not cop per UDJ-GSD） ──
+cop1:[["花子","PROPN",3,"nsubj","_"],["は","ADP",1,"case","_"],["きれい","ADJ",0,"root","_"],["だ","AUX",3,"aux","_"]],
+cop2:[["花子","PROPN",3,"nsubj","_"],["は","ADP",1,"case","_"],["きれい","ADJ",0,"root","_"],["だっ","AUX",3,"aux","_"],["た","AUX",3,"aux","_"]],
+cop3:[["きれい","ADJ",4,"advcl","_"],["だっ","AUX",1,"aux","_"],["たら","AUX",1,"aux","_"],["買う","VERB",0,"root","_"]],
+cop4:[["きれい","ADJ",0,"root","_"],["だろ","AUX",1,"aux","_"],["う","AUX",1,"aux","_"]],
+cop5:[["きれい","ADJ",3,"acl","_"],["な","AUX",1,"aux","_"],["花","NOUN",0,"root","_"]],
+cop6:[["きれい","ADJ",3,"advcl","_"],["なら","AUX",1,"aux","_"],["買う","VERB",0,"root","_"]],
+cop7:[["きれい","ADJ",3,"advcl","_"],["で","AUX",1,"aux","_"],["安い","ADJ",0,"root","_"]],
+cop8:[["きれい","ADJ",3,"advcl","_"],["に","AUX",1,"aux","_"],["飾る","VERB",0,"root","_"]],
+cop9:[["きれい","ADJ",0,"root","_"],["で","AUX",1,"aux","_"],["は","ADP",2,"fixed","_"],["ない","AUX",2,"fixed","Polarity=Neg"]],
+cop10:[["きれい","ADJ",0,"root","_"],["で","AUX",1,"aux","_"],["は","ADP",2,"fixed","_"],["なかっ","AUX",2,"fixed","Polarity=Neg"],["た","AUX",1,"aux","_"]],
+cop11:[["きれい","ADJ",0,"root","_"],["で","AUX",1,"aux","_"],["は","ADP",2,"fixed","_"],["あり","VERB",2,"fixed","_"],["ませ","AUX",2,"fixed","_"],["ん","AUX",2,"fixed","Polarity=Neg"]],
+cop12:[["きれい","ADJ",0,"root","_"],["で","AUX",1,"aux","_"],["は","ADP",2,"fixed","_"],["あり","VERB",2,"fixed","_"],["ませ","AUX",2,"fixed","_"],["ん","AUX",2,"fixed","Polarity=Neg"],["でし","AUX",1,"aux","_"],["た","AUX",1,"aux","_"]],
+cop13:[["きれい","ADJ",0,"root","_"],["で","AUX",1,"aux","_"],["ある","VERB",2,"fixed","_"]],
+cop14:[["きれい","ADJ",0,"root","_"],["で","AUX",1,"aux","_"],["あっ","VERB",2,"fixed","_"],["た","AUX",1,"aux","_"]],
+cop15:[["きれい","ADJ",0,"root","_"],["で","AUX",1,"aux","_"],["も","ADP",2,"fixed","_"],["ある","VERB",2,"fixed","_"]],
+// ── COP です系（ナ形容詞=ADJ → です is aux） ──
+desu1:[["花子","PROPN",3,"nsubj","_"],["は","ADP",1,"case","_"],["きれい","ADJ",0,"root","_"],["です","AUX",3,"aux","_"]],
+desu2:[["花子","PROPN",3,"nsubj","_"],["は","ADP",1,"case","_"],["きれい","ADJ",0,"root","_"],["でし","AUX",3,"aux","_"],["た","AUX",3,"aux","_"]],
+desu3:[["きれい","ADJ",0,"root","_"],["でしょ","AUX",1,"aux","_"],["う","AUX",1,"aux","_"]],
+// ── 動詞+AUX ──
+vaux1:[["花子","PROPN",3,"nsubj","_"],["が","ADP",1,"case","_"],["食べ","VERB",0,"root","_"],["た","AUX",3,"aux","_"]],
+vaux2:[["食べ","VERB",3,"advcl","_"],["たら","AUX",1,"aux","_"],["帰る","VERB",0,"root","_"]],
+vaux3:[["食べ","VERB",0,"root","_"],["ない","AUX",1,"aux","Polarity=Neg"]],
+vaux4:[["食べ","VERB",0,"root","_"],["なかっ","AUX",1,"aux","Polarity=Neg"],["た","AUX",1,"aux","_"]],
+vaux5:[["食べ","VERB",0,"root","_"],["なけれ","AUX",1,"aux","Polarity=Neg"],["ば","SCONJ",1,"mark","_"]],
+vaux6:[["食べ","VERB",0,"root","_"],["ます","AUX",1,"aux","_"]],
+vaux7:[["食べ","VERB",0,"root","_"],["まし","AUX",1,"aux","_"],["た","AUX",1,"aux","_"]],
+vaux8:[["食べ","VERB",0,"root","_"],["ませ","AUX",1,"aux","_"],["ん","AUX",1,"aux","Polarity=Neg"]],
+vaux9:[["食べ","VERB",0,"root","_"],["ませ","AUX",1,"aux","_"],["ん","AUX",1,"aux","Polarity=Neg"],["でし","AUX",1,"aux","_"],["た","AUX",1,"aux","_"]],
+vaux10:[["食べ","VERB",0,"root","_"],["たい","AUX",1,"aux","_"]],
+vaux11:[["食べ","VERB",0,"root","_"],["たかっ","AUX",1,"aux","_"],["た","AUX",1,"aux","_"]],
+vaux12:[["食べ","VERB",0,"root","_"],["られる","AUX",1,"aux","_"]],
+vaux13:[["食べ","VERB",0,"root","_"],["られ","AUX",1,"aux","_"],["た","AUX",1,"aux","_"]],
+vaux14:[["食べ","VERB",0,"root","_"],["させる","AUX",1,"aux","_"]],
+vaux15:[["食べ","VERB",0,"root","_"],["させ","AUX",1,"aux","_"],["た","AUX",1,"aux","_"]],
+vaux16:[["食べ","VERB",0,"root","_"],["させ","AUX",1,"aux","_"],["られ","AUX",1,"aux","_"],["た","AUX",1,"aux","_"]],
+// ── 動詞 複合 ──
+vc1a:[["食べ","VERB",4,"advcl","_"],["ない","AUX",1,"aux","Polarity=Neg"],["で","SCONJ",1,"mark","_"],["返す","VERB",0,"root","_"]],
+vc1b:[["食べ","VERB",0,"root","_"],["ない","AUX",1,"aux","Polarity=Neg"],["で","PART",1,"discourse","_"]],
+vc2:[["食べ","VERB",0,"root","_"],["なく","AUX",1,"aux","Polarity=Neg"],["て","SCONJ",1,"mark","_"]],
+vc3:[["食べ","VERB",0,"root","_"],["ず","AUX",1,"aux","Polarity=Neg"],["に","ADP",1,"case","_"]],
+vc4:[["食べ","VERB",0,"root","_"],["たく","AUX",1,"aux","_"],["ない","AUX",1,"aux","Polarity=Neg"]],
+vc5:[["食べ","VERB",0,"root","_"],["たく","AUX",1,"aux","_"],["なかっ","AUX",1,"aux","Polarity=Neg"],["た","AUX",1,"aux","_"]],
+vc6:[["食べ","VERB",0,"root","_"],["られ","AUX",1,"aux","_"],["ない","AUX",1,"aux","Polarity=Neg"]],
+vc7:[["食べ","VERB",0,"root","_"],["ましょ","AUX",1,"aux","_"],["う","AUX",1,"aux","_"]],
+// ── て形複合 ──
+te1:[["食べ","VERB",0,"root","_"],["て","SCONJ",1,"mark","_"],["いる","VERB",2,"fixed","_"]],
+te2:[["食べ","VERB",0,"root","_"],["て","SCONJ",1,"mark","_"],["い","VERB",2,"fixed","_"],["た","AUX",1,"aux","_"]],
+te3:[["食べ","VERB",0,"root","_"],["て","SCONJ",1,"mark","_"],["い","VERB",2,"fixed","_"],["ます","AUX",1,"aux","_"]],
+te4:[["食べ","VERB",0,"root","_"],["て","SCONJ",1,"mark","_"],["い","VERB",2,"fixed","_"],["ない","AUX",1,"aux","Polarity=Neg"]],
+te5:[["食べ","VERB",0,"root","_"],["て","SCONJ",1,"mark","_"],["しまう","VERB",2,"fixed","_"]],
+te6:[["食べ","VERB",0,"root","_"],["て","SCONJ",1,"mark","_"],["しまっ","VERB",2,"fixed","_"],["た","AUX",1,"aux","_"]],
+te7:[["食べ","VERB",0,"root","_"],["て","SCONJ",1,"mark","_"],["くる","VERB",2,"fixed","_"]],
+te8:[["食べ","VERB",0,"root","_"],["て","SCONJ",1,"mark","_"],["いく","VERB",2,"fixed","_"]],
+te9:[["食べ","VERB",0,"root","_"],["て","SCONJ",1,"mark","_"],["くれる","VERB",2,"fixed","_"]],
+te10:[["食べ","VERB",0,"root","_"],["て","SCONJ",1,"mark","_"],["もらう","VERB",2,"fixed","_"]],
+te11:[["食べ","VERB",0,"root","_"],["て","SCONJ",1,"mark","_"],["おく","VERB",2,"fixed","_"]],
+te12:[["食べ","VERB",0,"root","_"],["て","SCONJ",1,"mark","_"],["みる","VERB",2,"fixed","_"]],
+te13:[["食べ","VERB",0,"root","_"],["て","SCONJ",1,"mark","_"],["ください","VERB",2,"fixed","_"]],
+te14:[["面白い","ADJ",2,"acl","_"],["もの","NOUN",4,"nsubj","_"],["も","ADP",2,"case","_"],["おい","VERB",0,"root","_"],["て","SCONJ",4,"mark","_"],["ある","VERB",5,"fixed","_"],["。","PUNCT",4,"punct","_"]],
+te15:[["誰","PRON",4,"obj","_"],["か","ADP",1,"case","_"],["を","ADP",1,"case","_"],["連れ","VERB",6,"advcl","_"],["て","SCONJ",4,"mark","_"],["いっ","VERB",8,"advcl","_"],["て","SCONJ",6,"mark","_"],["あげ","VERB",12,"ccomp","_"],["たい","AUX",8,"aux","_"],["なー","PART",8,"mark","_"],["と","ADP",8,"case","_"],["思える","VERB",15,"acl","_"],["お","NOUN",15,"compound","_"],["店","NOUN",15,"compound","_"],["さん","NOUN",0,"root","_"],["でし","AUX",15,"cop","_"],["た","AUX",15,"aux","_"],["。","PUNCT",15,"punct","_"]],
+// ── い形容詞 ──
+adj1:[["高い","ADJ",0,"root","_"]],
+adj2:[["高かっ","ADJ",0,"root","_"],["た","AUX",1,"aux","_"]],
+adj3:[["高く","ADJ",0,"root","_"],["ない","AUX",1,"aux","Polarity=Neg"]],
+adj4:[["高く","ADJ",0,"root","_"],["なかっ","AUX",1,"aux","Polarity=Neg"],["た","AUX",1,"aux","_"]],
+adj5:[["高けれ","ADJ",3,"advcl","_"],["ば","SCONJ",1,"mark","_"],["買う","VERB",0,"root","_"]],
+adj6:[["高く","ADJ",3,"advcl","_"],["て","SCONJ",1,"mark","_"],["安い","ADJ",0,"root","_"]],
+adj7:[["高く","ADJ",2,"advmod","_"],["飾る","VERB",0,"root","_"]],
+adj8:[["高い","ADJ",2,"acl","_"],["花","NOUN",0,"root","_"]],
+adje1:[["高","ADJ",0,"root","_"],["そう","AUX",1,"aux","_"],["だ","AUX",1,"aux","_"]],
+adje2:[["高","ADJ",0,"root","_"],["すぎる","VERB",1,"advcl","_"]],
+adje3:[["高く","ADJ",2,"advcl","_"],["なる","VERB",0,"root","_"]],
+adje4:[["高く","ADJ",2,"advcl","_"],["する","VERB",0,"root","_"]],
+adje5:[["高","ADJ",0,"root","_"],["さ","PART",1,"mark","_"]],
+adje6:[["高","ADJ",0,"root","_"],["み","PART",1,"mark","_"]],
+// ── 名詞述語（NOUN → だ is cop） ──
+np1:[["花子","PROPN",3,"nsubj","_"],["は","ADP",1,"case","_"],["学生","NOUN",0,"root","_"],["だ","AUX",3,"cop","_"]],
+np2:[["花子","PROPN",3,"nsubj","_"],["は","ADP",1,"case","_"],["学生","NOUN",0,"root","_"],["です","AUX",3,"cop","_"]],
+np3:[["花子","PROPN",3,"nsubj","_"],["は","ADP",1,"case","_"],["学生","NOUN",0,"root","_"],["で","AUX",3,"cop","_"],["は","ADP",4,"fixed","_"],["ない","AUX",4,"fixed","Polarity=Neg"]],
+np4:[["花子","PROPN",3,"nsubj","_"],["は","ADP",1,"case","_"],["学生","NOUN",0,"root","_"],["だっ","AUX",3,"cop","_"],["た","AUX",3,"aux","_"]],
+np5:[["花子","PROPN",3,"nsubj","_"],["は","ADP",1,"case","_"],["学生","NOUN",0,"root","_"],["でし","AUX",3,"cop","_"],["た","AUX",3,"aux","_"]],
+np6:[["学生","NOUN",3,"obl","_"],["に","ADP",1,"case","_"],["なる","VERB",0,"root","_"]],
+// ── 意志・命令・禁止 ──
+ishi1:[["食べ","VERB",0,"root","_"],["よう","AUX",1,"aux","_"]],
+ishi2:[["食べ","VERB",0,"root","_"],["まい","AUX",1,"aux","Polarity=Neg"]],
+ishi3:[["食べろ","VERB",0,"root","_"]],
+ishi4:[["食べ","VERB",0,"root","_"],["なさい","AUX",1,"aux","_"]],
+ishi5:[["食べる","VERB",0,"root","_"],["な","PART",1,"mark","_"]],
+// ── 条件形 ──
+joken1:[["食べれ","VERB",3,"advcl","_"],["ば","SCONJ",1,"mark","_"],["帰る","VERB",0,"root","_"]],
+joken2:[["食べる","VERB",3,"advcl","_"],["と","SCONJ",1,"mark","_"],["帰る","VERB",0,"root","_"]],
+// ── 接続助詞 ──
+setsu1:[["食べる","VERB",3,"advcl","_"],["から","SCONJ",1,"mark","_"],["帰る","VERB",0,"root","_"]],
+setsu2:[["食べる","VERB",3,"advcl","_"],["ので","SCONJ",1,"mark","_"],["帰る","VERB",0,"root","_"]],
+setsu3:[["食べる","VERB",3,"advcl","_"],["のに","SCONJ",1,"mark","_"],["帰る","VERB",0,"root","_"]],
+setsu4:[["食べる","VERB",3,"advcl","_"],["けど","SCONJ",1,"mark","_"],["帰る","VERB",0,"root","_"]],
+setsu5:[["食べる","VERB",3,"advcl","_"],["が","SCONJ",1,"mark","_"],["帰る","VERB",0,"root","_"]],
+setsu6:[["食べる","VERB",3,"advcl","_"],["し","SCONJ",1,"mark","_"],["飲む","VERB",0,"root","_"]],
+setsu7:[["食べ","VERB",4,"advcl","_"],["て","SCONJ",1,"mark","_"],["も","ADP",1,"case","_"],["帰る","VERB",0,"root","_"]],
+setsu8:[["食べ","VERB",3,"advcl","_"],["ながら","SCONJ",1,"mark","_"],["歩く","VERB",0,"root","_"]],
+setsu9:[["食べ","VERB",5,"advcl","_"],["たり","PART",1,"mark","_"],["飲ん","VERB",5,"advcl","_"],["だり","PART",3,"mark","_"],["する","VERB",0,"root","_"]],
+setsu10:[["人員","NOUN",3,"nmod","_"],["の","ADP",1,"case","_"],["異動","NOUN",5,"nsubj","_"],["は","ADP",3,"case","_"],["伴う","VERB",6,"advcl","_"],["もの","SCONJ",11,"nmod","_"],["の","SCONJ",6,"fixed","_"],["「","PUNCT",9,"punct","_"],["雇用","NOUN",11,"nsubj","_"],["は","ADP",9,"case","_"],["維持","VERB",15,"advcl","_"],["する","AUX",11,"aux","_"],["」","PUNCT",11,"punct","_"],["と","ADP",11,"case","_"],["説明","VERB",0,"root","_"],["し","AUX",15,"aux","_"],["て","SCONJ",15,"mark","_"],["いる","VERB",17,"fixed","_"],["。","PUNCT",15,"punct","_"]],
+setsu11:[["渋谷","PROPN",2,"compound","_"],["駅","NOUN",4,"obl","_"],["から","ADP",2,"case","_"],["すぐ","ADV",18,"advcl","_"],["で","AUX",4,"aux","_"],["ある","VERB",5,"fixed","_"],["に","SCONJ",4,"mark","_"],["も","SCONJ",7,"fixed","_"],["かかわら","SCONJ",7,"fixed","_"],["ず","SCONJ",7,"fixed","Polarity=Neg"],["、","PUNCT",4,"punct","_"],["静か","ADJ",14,"advcl","_"],["で","AUX",12,"aux","_"],["落ち着ける","VERB",18,"csubj","_"],["の","SCONJ",14,"mark","_"],["が","ADP",14,"case","_"],["とても","ADV",18,"advmod","_"],["よい","ADJ",0,"root","_"],["。","PUNCT",18,"punct","_"]],
+setsu12:[["家","NOUN",3,"obl","_"],["から","ADP",1,"case","_"],["近い","ADJ",15,"advcl","_"],["と","ADP",3,"case","_"],["し","SCONJ",4,"fixed","_"],["て","SCONJ",4,"fixed","_"],["も","SCONJ",4,"fixed","_"],["、","PUNCT",3,"punct","_"],["他","NOUN",11,"obj","_"],["を","ADP",9,"case","_"],["選ん","VERB",13,"acl","_"],["だ","AUX",11,"aux","_"],["方","NOUN",15,"nsubj","_"],["が","ADP",13,"case","_"],["賢明","ADJ",0,"root","_"],["です","AUX",15,"aux","_"],["。","PUNCT",15,"punct","_"]],
+setsu13:[["食べる","VERB",6,"advcl","_"],["に","ADP",1,"case","_"],["し","AUX",2,"fixed","_"],["て","SCONJ",2,"fixed","_"],["も","ADP",2,"fixed","_"],["帰る","VERB",0,"root","_"]],
+setsu14:[["食べる","VERB",5,"advcl","_"],["と","ADP",1,"case","_"],["は","ADP",2,"fixed","_"],["いえ","VERB",2,"fixed","_"],["帰る","VERB",0,"root","_"]],
+// ── のだ系（UDJ-GSD: の=SCONJ/mark, だ=AUX/fixed） ──
+noda1:[["食べる","VERB",0,"root","_"],["の","SCONJ",1,"mark","_"],["だ","AUX",2,"fixed","_"]],
+noda2:[["食べる","VERB",0,"root","_"],["の","SCONJ",1,"mark","_"],["です","AUX",2,"fixed","_"]],
+noda3:[["食べ","VERB",0,"root","_"],["た","AUX",1,"aux","_"],["の","SCONJ",1,"mark","_"],["だ","AUX",3,"fixed","_"]],
+noda4:[["食べる","VERB",0,"root","_"],["ん","SCONJ",1,"mark","_"],["だ","AUX",2,"fixed","_"]],
+noda5:[["食べ","VERB",0,"root","_"],["ない","AUX",1,"aux","Polarity=Neg"],["の","SCONJ",1,"mark","_"],["だ","AUX",3,"fixed","_"]],
+noda6:[["食べる","VERB",0,"root","_"],["の","SCONJ",1,"mark","_"],["で","AUX",2,"fixed","_"],["は","ADP",2,"fixed","_"],["ない","AUX",2,"fixed","_"]],
+noda7:[["食べる","VERB",0,"root","_"],["の","SCONJ",1,"mark","_"],["で","AUX",2,"fixed","_"],["ある","VERB",2,"fixed","_"]],
+noda8:[["食べる","VERB",0,"root","_"],["の","SCONJ",1,"mark","_"],["でしょう","AUX",2,"fixed","_"]],
+noda9:[["食べる","VERB",0,"root","_"],["ん","SCONJ",1,"mark","_"],["じゃ","AUX",2,"fixed","_"],["ない","AUX",2,"fixed","_"]],
+// ── 義務・許可（UDJ-GSD: なければならない＝fixed chain off なけれ） ──
+gimu1:[["食べ","VERB",0,"root","_"],["なけれ","AUX",1,"aux","Polarity=Neg"],["ば","SCONJ",2,"fixed","_"],["なら","VERB",2,"fixed","_"],["ない","AUX",2,"fixed","Polarity=Neg"]],
+gimu2:[["食べ","VERB",0,"root","_"],["なく","AUX",1,"aux","Polarity=Neg"],["て","SCONJ",2,"fixed","_"],["は","ADP",2,"fixed","_"],["いけ","VERB",2,"fixed","_"],["ない","AUX",2,"fixed","Polarity=Neg"]],
+gimu3:[["食べ","VERB",0,"root","_"],["なく","AUX",1,"aux","Polarity=Neg"],["て","SCONJ",1,"mark","_"],["も","ADP",3,"fixed","_"],["いい","AUX",3,"fixed","_"]],
+gimu4:[["食べ","VERB",0,"root","_"],["て","SCONJ",1,"mark","_"],["も","ADP",2,"fixed","_"],["いい","AUX",2,"fixed","_"]],
+gimu5:[["食べる","VERB",0,"root","_"],["べき","AUX",1,"aux","_"],["だ","AUX",1,"aux","_"]],
+gimu6:[["食べ","VERB",0,"root","_"],["て","SCONJ",1,"mark","_"],["は","ADP",2,"fixed","_"],["なら","VERB",2,"fixed","_"],["ない","AUX",2,"fixed","Polarity=Neg"]],
+gimu7:[["食べ","VERB",0,"root","_"],["なく","AUX",1,"aux","Polarity=Neg"],["て","SCONJ",2,"fixed","_"],["は","ADP",2,"fixed","_"],["なら","VERB",2,"fixed","_"],["ない","AUX",2,"fixed","Polarity=Neg"]],
+gimu8:[["食べ","VERB",0,"root","_"],["ざる","AUX",1,"aux","Polarity=Neg"],["を","ADP",2,"fixed","_"],["え","VERB",2,"fixed","_"],["ない","AUX",2,"fixed","Polarity=Neg"]],
+gimu9:[["食べ","VERB",0,"root","_"],["ない","AUX",1,"aux","Polarity=Neg"],["で","ADP",2,"fixed","_"],["は","ADP",2,"fixed","_"],["い","VERB",2,"fixed","_"],["られ","AUX",2,"fixed","_"],["ない","AUX",2,"fixed","Polarity=Neg"]],
+gimu10:[["食べれ","VERB",0,"root","_"],["ば","SCONJ",1,"mark","_"],["いい","ADJ",2,"fixed","_"]],
+gimu11:[["食べ","VERB",0,"root","_"],["たら","AUX",1,"aux","_"],["いい","AUX",2,"fixed","_"]],
+// ── モダリティ ──
+mod1:[["食べる","VERB",0,"root","_"],["か","PART",1,"mark","_"],["も","ADP",2,"fixed","_"],["しれ","VERB",2,"fixed","_"],["ない","AUX",2,"fixed","Polarity=Neg"]],
+mod2:[["食べる","VERB",0,"root","_"],["に","ADP",3,"case","_"],["ちがい","NOUN",1,"obl","_"],["ない","ADJ",1,"advcl","_"]],
+mod3:[["食べ","VERB",0,"root","_"],["た","AUX",1,"aux","_"],["らしい","AUX",1,"aux","_"]],
+mod4:[["食べ","VERB",0,"root","_"],["た","AUX",1,"aux","_"],["そう","AUX",1,"aux","_"],["だ","AUX",1,"aux","_"]],
+mod5:[["食べる","VERB",0,"root","_"],["みたい","AUX",1,"aux","_"],["だ","AUX",1,"aux","_"]],
+mod6:[["食べ","VERB",0,"root","_"],["て","SCONJ",1,"mark","_"],["ほしい","AUX",2,"fixed","_"]],
+mod7:[["食べる","VERB",2,"acl","_"],["はず","NOUN",0,"root","_"],["だ","AUX",2,"cop","_"]],
+mod8:[["食べる","VERB",2,"acl","_"],["わけ","NOUN",0,"root","_"],["が","ADP",2,"case","_"],["ない","ADJ",2,"acl","_"]],
+mod9:[["食べる","VERB",0,"root","_"],["よう","AUX",1,"aux","_"],["だ","AUX",1,"aux","_"]],
+mod10:[["食べ","VERB",0,"root","_"],["そう","AUX",1,"aux","_"],["だ","AUX",1,"aux","_"]],
+mod11:[["食べる","VERB",3,"obl","_"],["に","ADP",1,"case","_"],["すぎ","VERB",0,"root","_"],["ない","AUX",3,"aux","Polarity=Neg"]],
+mod12:[["食べる","VERB",0,"root","_"],["しか","ADP",1,"case","_"],["ない","ADJ",2,"fixed","_"]],
+mod13:[["食べる","VERB",0,"root","_"],["か","PART",1,"mark","_"],["も","ADP",2,"fixed","_"],["しれ","VERB",2,"fixed","_"],["ませ","AUX",2,"fixed","_"],["ん","AUX",2,"fixed","_"]],
+mod14:[["食べる","VERB",2,"acl","_"],["わけ","NOUN",0,"root","_"],["で","AUX",2,"cop","_"],["は","ADP",2,"case","_"],["ない","ADJ",2,"advcl","_"]],
+// ── 形式名詞構文（UDJ-GSD: ことが＝compound+fixed chain） ──
+kei1:[["食べる","VERB",2,"acl","_"],["ところ","NOUN",0,"root","_"],["だ","AUX",2,"cop","_"]],
+kei2:[["食べる","VERB",2,"acl","_"],["つもり","NOUN",0,"root","_"],["だ","AUX",2,"cop","_"]],
+kei3:[["食べる","VERB",0,"root","_"],["こと","NOUN",1,"compound","_"],["が","ADP",2,"fixed","_"],["できる","AUX",2,"fixed","_"]],
+kei4:[["食べる","VERB",2,"acl","_"],["よう","NOUN",4,"obl","_"],["に","ADP",2,"case","_"],["する","VERB",0,"root","_"]],
+kei5:[["食べ","VERB",4,"xcomp","_"],["よう","AUX",1,"aux","_"],["と","SCONJ",1,"mark","_"],["する","VERB",0,"root","_"]],
+kei6:[["食べ","VERB",0,"root","_"],["た","AUX",1,"aux","_"],["こと","NOUN",1,"compound","_"],["が","ADP",3,"fixed","_"],["ある","VERB",3,"fixed","_"]],
+kei7:[["『","PUNCT",4,"punct","_"],["スター","NOUN",4,"compound","_"],["・","SYM",4,"compound","_"],["ウォーズ","NOUN",10,"nmod","_"],["』","PUNCT",4,"punct","_"],["の","ADP",4,"case","_"],["ダース","PROPN",10,"compound","_"],["・","SYM",10,"compound","_"],["ベイダー","PROPN",10,"compound","_"],["役","NOUN",12,"nmod","_"],["の","ADP",10,"case","_"],["オーディション","NOUN",14,"obj","_"],["を","ADP",12,"case","_"],["受け","VERB",0,"root","_"],["た","AUX",14,"aux","_"],["こと","NOUN",14,"compound","_"],["も","ADP",16,"fixed","_"],["ある","VERB",16,"fixed","_"],["。","PUNCT",14,"punct","_"]],
+kei8:[["加え","VERB",10,"advcl","_"],["て","SCONJ",1,"mark","_"],["、","PUNCT",1,"punct","_"],["この","DET",8,"det","_"],["今回","NOUN",8,"nmod","_"],["の","ADP",5,"case","_"],["リリース","NOUN",8,"compound","_"],["方法","NOUN",10,"nsubj","_"],["も","ADP",8,"case","_"],["面白い","ADJ",0,"root","_"],["こと","NOUN",10,"compound","_"],["が","ADP",11,"fixed","_"],["ある","VERB",11,"fixed","_"],["。","PUNCT",10,"punct","_"]],
+kei9:[["弓なり","NOUN",3,"nmod","_"],["の","ADP",1,"case","_"],["緑地","NOUN",15,"nsubj","_"],["は","ADP",3,"case","_"],["、","PUNCT",3,"punct","_"],["この","DET",7,"det","_"],["町","NOUN",12,"nsubj","_"],["が","ADP",7,"case","_"],["丘陵","NOUN",10,"compound","_"],["地","NOUN",12,"obl","_"],["に","ADP",10,"case","_"],["ある","VERB",13,"acl","_"],["こと","NOUN",15,"obj","_"],["を","ADP",13,"case","_"],["示し","VERB",0,"root","_"],["て","SCONJ",15,"mark","_"],["いる","VERB",16,"fixed","_"],["。","PUNCT",15,"punct","_"]],
+kei10:[["殺害","NOUN",2,"compound","_"],["遺品","NOUN",4,"obj","_"],["を","ADP",2,"case","_"],["所有","VERB",6,"acl","_"],["する","AUX",4,"aux","_"],["者","NOUN",8,"nmod","_"],["の","ADP",6,"case","_"],["こと","NOUN",19,"advcl","_"],["で","AUX",8,"cop","_"],["、","PUNCT",8,"punct","_"],["基本","NOUN",19,"obl","_"],["的","PART",11,"mark","_"],["に","AUX",11,"cop","_"],["殺人","NOUN",15,"compound","_"],["鬼","NOUN",17,"nmod","_"],["の","ADP",15,"case","_"],["子孫","NOUN",19,"nsubj","_"],["が","ADP",17,"case","_"],["選ば","VERB",0,"root","_"],["れる","AUX",19,"aux","_"],["。","PUNCT",19,"punct","_"]],
+kei11:[["上級","NOUN",2,"compound","_"],["生","NOUN",6,"nmod","_"],["の","ADP",2,"case","_"],["豊富","ADJ",6,"acl","_"],["な","AUX",4,"aux","_"],["経験","NOUN",12,"obl","_"],["と","ADP",6,"case","_"],["下級","NOUN",9,"compound","_"],["生","NOUN",12,"nmod","_"],["の","ADP",9,"case","_"],["高い","ADJ",12,"acl","_"],["能力","NOUN",14,"nsubj","_"],["が","ADP",12,"case","_"],["融合","VERB",16,"acl","_"],["する","AUX",14,"aux","_"],["こと","NOUN",24,"advcl","_"],["で","AUX",16,"cop","_"],["、","PUNCT",16,"punct","_"],["もっと","ADV",21,"advmod","_"],["もっと","ADV",21,"advmod","_"],["強い","ADJ",22,"acl","_"],["チーム","NOUN",24,"obl","_"],["に","ADP",22,"case","_"],["なれる","VERB",0,"root","_"],["。","PUNCT",24,"punct","_"]],
+kei12:[["その","DET",2,"det","_"],["ため","NOUN",11,"nmod","_"],["、","PUNCT",2,"punct","_"],["生徒","NOUN",6,"nsubj","_"],["は","ADP",4,"case","_"],["もちろん","ADV",8,"advmod","_"],["、","PUNCT",6,"punct","_"],["職員","NOUN",11,"obl","_"],["に","ADP",8,"case","_"],["も","ADP",8,"case","_"],["人気","NOUN",0,"root","_"],["で","AUX",11,"cop","_"],["ある","VERB",12,"fixed","_"],["。","PUNCT",11,"punct","_"]],
+kei13:[["その","DET",3,"det","_"],["長髪","NOUN",3,"compound","_"],["男性","NOUN",12,"nsubj","_"],["は","ADP",3,"case","_"],[",","PUNCT",3,"punct","_"],["苫米地","PROPN",8,"compound","_"],["英人","PROPN",8,"compound","_"],["氏","NOUN",10,"nmod","_"],["の","ADP",8,"case","_"],["よう","NOUN",12,"advcl","_"],["に","AUX",10,"cop","_"],["見え","VERB",0,"root","_"],["ます","AUX",12,"aux","_"],["。","PUNCT",12,"punct","_"]],
+// ── 格助詞 ──
+kaku1:[["一般","NOUN",5,"acl","_"],["的","PART",1,"mark","_"],["な","AUX",1,"cop","_"],["層流","NOUN",5,"compound","_"],["翼型","NOUN",7,"obl","_"],["と","ADP",5,"case","_"],["比べ","VERB",11,"advcl","_"],["負圧","NOUN",9,"compound","_"],["中心","NOUN",11,"nsubj","_"],["が","ADP",9,"case","_"],["前進","VERB",17,"advcl","_"],["し","AUX",11,"aux","_"],["、","PUNCT",11,"punct","_"],["圧力","NOUN",15,"compound","_"],["勾配","NOUN",17,"nsubj","_"],["は","ADP",15,"case","_"],["なだらか","ADJ",0,"root","_"],["で","AUX",17,"aux","_"],["ある","VERB",18,"fixed","_"],["。","PUNCT",17,"punct","_"]],
+kaku2:[["一","NUM",2,"nummod","_"],["直線","NOUN",4,"obl","_"],["に","ADP",2,"case","_"],["伸びる","VERB",5,"acl","_"],["電撃","NOUN",7,"obj","_"],["を","ADP",5,"case","_"],["放ち","VERB",12,"advcl","_"],["、","PUNCT",7,"punct","_"],["電撃","NOUN",10,"compound","_"],["ダメージ","NOUN",12,"obj","_"],["を","ADP",10,"case","_"],["与える","VERB",0,"root","_"],["。","PUNCT",12,"punct","_"]],
+kaku3:[["統一","NOUN",2,"compound","_"],["教会","NOUN",4,"obl","_"],["に","ADP",2,"case","_"],["導ける","VERB",0,"root","_"],["!","PUNCT",4,"punct","_"]],
+kaku4:[["幸福","NOUN",3,"compound","_"],["実現","NOUN",3,"compound","_"],["党","NOUN",7,"nmod","_"],["へ","ADP",3,"case","_"],["の","ADP",3,"case","_"],["応援","NOUN",7,"compound","_"],["メッセージ","NOUN",9,"nsubj","_"],["も","ADP",7,"case","_"],["あり","VERB",0,"root","_"],["ます","AUX",9,"aux","_"],["。","PUNCT",9,"punct","_"]],
+kaku5:[["カット","NOUN",6,"nsubj","_"],["は","ADP",1,"case","_"],["24","NUM",4,"nummod","_"],["時","NOUN",6,"obl","_"],["まで","ADP",4,"case","_"],["受け付け","VERB",17,"advcl","_"],["て","SCONJ",6,"mark","_"],["くる","VERB",7,"fixed","_"],["の","SCONJ",6,"mark","_"],["で","AUX",9,"fixed","_"],["仕事帰り","NOUN",14,"obl","_"],["で","ADP",11,"case","_"],["遅く","ADJ",14,"advcl","_"],["なっ","VERB",17,"advcl","_"],["て","SCONJ",14,"mark","_"],["も","ADP",14,"case","_"],["いけ","VERB",0,"root","_"],["ます","AUX",17,"aux","_"],["ね","PART",17,"mark","_"],["。","PUNCT",17,"punct","_"]],
+kaku6:[["色々","ADV",3,"advmod","_"],["と","ADP",1,"case","_"],["面白い","ADJ",4,"acl","_"],["メニュー","NOUN",6,"nmod","_"],["の","ADP",4,"case","_"],["ある","VERB",7,"acl","_"],["店","NOUN",0,"root","_"],["。","PUNCT",7,"punct","_"]],
+kaku7:[["福岡","PROPN",2,"compound","_"],["ローカル","NOUN",8,"obl","_"],["で","ADP",2,"case","_"],["1970","NUM",6,"compound","_"],["年","NOUN",6,"compound","_"],["代","NOUN",8,"obl","_"],["から","ADP",6,"case","_"],["放送","VERB",13,"acl","_"],["さ","AUX",8,"aux","_"],["れ","AUX",8,"aux","_"],["て","SCONJ",8,"mark","_"],["いる","VERB",11,"fixed","_"],["CM","NOUN",16,"nsubj","_"],["も","ADP",13,"case","_"],["大変","ADV",16,"advmod","_"],["有名","ADJ",0,"root","_"],["で","AUX",16,"aux","_"],["ある","VERB",17,"fixed","_"],["。","PUNCT",16,"punct","_"]],
+kaku8:[["徒歩","NOUN",3,"compound","_"],["15","NUM",3,"nummod","_"],["分","NOUN",7,"obl","_"],["で","ADP",3,"case","_"],["港","NOUN",7,"obl","_"],["まで","ADP",5,"case","_"],["いける","VERB",12,"advcl","_"],["の","SCONJ",7,"mark","_"],["で","AUX",8,"fixed","_"],["アクセス","NOUN",12,"obl","_"],["に","ADP",10,"case","_"],["便利","ADJ",0,"root","_"],["でし","AUX",12,"aux","_"],["た","AUX",12,"aux","_"],["。","PUNCT",12,"punct","_"]],
+kaku9:[["なお","CCONJ",17,"cc","_"],["、","PUNCT",1,"punct","_"],["唯一","NOUN",5,"nmod","_"],["の","ADP",3,"case","_"],["趣味","NOUN",7,"nsubj","_"],["は","ADP",5,"case","_"],["料理","NOUN",17,"advcl","_"],["で","AUX",7,"cop","_"],["あり","VERB",8,"fixed","_"],["、","PUNCT",7,"punct","_"],["その","DET",12,"det","_"],["腕","NOUN",17,"nsubj","_"],["は","ADP",12,"case","_"],["ネリン","PROPN",17,"obl","_"],["より","ADP",14,"case","_"],["も","ADP",14,"case","_"],["上手い","ADJ",0,"root","_"],["。","PUNCT",17,"punct","_"]],
+kaku10:[["葬儀","NOUN",3,"nmod","_"],["の","ADP",1,"case","_"],["最中","NOUN",0,"root","_"],["です","AUX",3,"cop","_"],["よ","PART",3,"mark","_"],["!","PUNCT",3,"punct","_"]],
+// ── とりたて助詞 ──
+tori1:[["医師","NOUN",5,"nmod","_"],["の","ADP",1,"case","_"],["丁寧","ADJ",5,"acl","_"],["な","AUX",3,"aux","_"],["診察","NOUN",7,"nmod","_"],["や","ADP",5,"case","_"],["検査","NOUN",13,"obl","_"],["に","ADP",7,"case","_"],["は","ADP",7,"case","_"],["安心","NOUN",11,"compound","_"],["感","NOUN",13,"nsubj","_"],["が","ADP",11,"case","_"],["もて","VERB",0,"root","_"],["まし","AUX",13,"aux","_"],["た","AUX",13,"aux","_"],["ね","PART",13,"mark","_"],["。","PUNCT",13,"punct","_"]],
+tori2:[["店員","NOUN",2,"compound","_"],["さん","NOUN",4,"nmod","_"],["の","ADP",2,"case","_"],["接客","NOUN",7,"nsubj","_"],["も","ADP",4,"case","_"],["とても","ADV",7,"advmod","_"],["良かっ","ADJ",0,"root","_"],["た","AUX",7,"aux","_"],["です","AUX",7,"aux","_"],["。","PUNCT",7,"punct","_"]],
+tori3:[["さらに","CCONJ",17,"cc","_"],["テレパシー","NOUN",7,"nmod","_"],["、","PUNCT",2,"punct","_"],["心","NOUN",6,"obj","_"],["を","ADP",4,"case","_"],["読む","VERB",7,"acl","_"],["こと","NOUN",17,"obl","_"],["、","PUNCT",7,"punct","_"],["他人","NOUN",10,"compound","_"],["同士","NOUN",14,"nmod","_"],["の","ADP",10,"case","_"],["テレパシー","NOUN",14,"nmod","_"],["の","ADP",12,"case","_"],["会話","NOUN",17,"obl","_"],["さえ","ADP",14,"case","_"],["も","ADP",14,"case","_"],["聞き取れる","VERB",0,"root","_"],["。","PUNCT",17,"punct","_"]],
+tori4:[["めずらしい","ADJ",2,"acl","_"],["種類","NOUN",5,"nsubj","_"],["が","ADP",2,"case","_"],["たくさん","ADV",5,"advmod","_"],["あり","VERB",12,"advcl","_"],["、","PUNCT",5,"punct","_"],["ここ","PRON",10,"nmod","_"],["の","ADP",7,"case","_"],["お","NOUN",10,"compound","_"],["店","NOUN",12,"obl","_"],["だけ","ADP",10,"case","_"],["楽しめる","VERB",13,"acl","_"],["デザート","NOUN",15,"obl","_"],["に","ADP",13,"case","_"],["なっ","VERB",18,"ccomp","_"],["てる","AUX",15,"aux","_"],["と","ADP",15,"case","_"],["思い","VERB",0,"root","_"],["ます","AUX",18,"aux","_"],["。","PUNCT",18,"punct","_"]],
+tori5:[["店舗","NOUN",3,"nmod","_"],["の","ADP",1,"case","_"],["見","VERB",18,"nsubj:outer","_"],["た","AUX",3,"aux","_"],["目","NOUN",3,"compound","_"],["が","ADP",3,"case","_"],["居酒屋","NOUN",8,"compound","_"],["大","NOUN",11,"nmod","_"],["の","ADP",8,"case","_"],["二","NUM",11,"nummod","_"],["階","NOUN",14,"obl","_"],["に","ADP",11,"case","_"],["しか","ADP",11,"case","_"],["見え","VERB",18,"csubj","_"],["ない","AUX",14,"aux","Polarity=Neg"],["の","SCONJ",14,"mark","_"],["が","ADP",14,"case","_"],["残念","ADJ",0,"root","_"],["。","PUNCT",18,"punct","_"]],
+tori6:[["元","NOUN",2,"compound","_"],["記事","NOUN",7,"nmod","_"],["の","ADP",2,"case","_"],["機械","NOUN",7,"acl","_"],["的","PART",4,"mark","_"],["な","AUX",4,"cop","_"],["コピペ","NOUN",0,"root","_"],["ばかり","ADP",7,"case","_"],["で","AUX",7,"cop","_"],["は","ADP",9,"fixed","_"],["ない","AUX",9,"fixed","_"],["よう","AUX",7,"aux","_"],["です","AUX",7,"cop","_"],["。","PUNCT",7,"punct","_"]],
+tori7:[["8","NUM",2,"nummod","_"],["年","NOUN",4,"obl","_"],["ほど","ADP",2,"case","_"],["行っ","VERB",14,"advcl","_"],["て","AUX",4,"aux","_"],["ない","AUX",4,"aux","Polarity=Neg"],["けど","SCONJ",4,"mark","_"],["とても","ADV",9,"advmod","_"],["美味しく","ADJ",14,"advcl","_"],["て","SCONJ",9,"mark","_"],["雰囲気","NOUN",14,"nsubj","_"],["も","ADP",11,"case","_"],["また","ADV",14,"advmod","_"],["行き","VERB",0,"root","_"],["たい","AUX",14,"aux","_"],["です","AUX",14,"aux","_"],["!","PUNCT",14,"punct","_"]],
+tori8:[["『","PUNCT",4,"punct","_"],["三十","NUM",4,"compound","_"],["五","NUM",4,"nummod","_"],["人","NOUN",7,"nmod","_"],["の","ADP",4,"case","_"],["小学","NOUN",7,"compound","_"],["生","NOUN",11,"nmod","_"],["』","PUNCT",7,"punct","_"],["など","ADP",7,"case","_"],["の","ADP",7,"case","_"],["作品","NOUN",13,"obj","_"],["を","ADP",11,"case","_"],["収録","VERB",0,"root","_"],["し","AUX",13,"aux","_"],["て","SCONJ",13,"mark","_"],["いる","VERB",15,"fixed","_"],["。","PUNCT",13,"punct","_"]],
+// ── 敬語 ──
+keigo1:[["召し上がる","VERB",0,"root","_"]],
+keigo2:[["召し上がっ","VERB",0,"root","_"],["た","AUX",1,"aux","_"]],
+keigo3:[["2008","NUM",4,"compound","_"],["年","NOUN",4,"compound","_"],["8","NUM",4,"nummod","_"],["月","NOUN",19,"obl","_"],["から","ADP",4,"case","_"],["みやぎ","PROPN",8,"compound","_"],["生協","NOUN",8,"compound","_"],["新寺","PROPN",10,"nmod","_"],["2","NUM",10,"nummod","_"],["F","NOUN",12,"obl","_"],["に","ADP",10,"case","_"],["ある","VERB",17,"acl","_"],["医療","NOUN",17,"compound","_"],["モール","NOUN",17,"compound","_"],["・","SYM",17,"compound","_"],["レイール","NOUN",17,"compound","_"],["内","NOUN",19,"obl","_"],["に","ADP",17,"case","_"],["移転","VERB",0,"root","_"],["いたし","AUX",19,"aux","_"],["て","SCONJ",19,"mark","_"],["おり","VERB",21,"fixed","_"],["ます","AUX",19,"aux","_"],["。","PUNCT",19,"punct","_"]],
+keigo4:[["この","DET",2,"det","_"],["こと","NOUN",4,"obj","_"],["を","ADP",2,"case","_"],["伝え","VERB",8,"advcl","_"],["たく","AUX",4,"aux","_"],[",","PUNCT",4,"punct","_"],["お","NOUN",8,"compound","_"],["電話","VERB",16,"advcl","_"],["し","AUX",8,"aux","_"],["まし","AUX",8,"aux","_"],["た","AUX",8,"aux","_"],["が","SCONJ",8,"mark","_"],[",","PUNCT",8,"punct","_"],["今後","ADV",16,"advmod","_"],["一切","ADV",16,"advmod","_"],["連絡","VERB",0,"root","_"],["いたし","AUX",16,"aux","_"],["ませ","AUX",16,"aux","_"],["ん","AUX",16,"aux","Polarity=Neg"],["。","PUNCT",16,"punct","_"]],
+keigo5:[["おっしゃる","VERB",0,"root","_"]],
+keigo6:[["お","NOUN",4,"compound","_"],["食べ","VERB",1,"flat","_"],["に","ADP",1,"case","_"],["なる","VERB",0,"root","_"]],
+keigo7:[["本当","NOUN",7,"obl","_"],["に","ADP",1,"case","_"],["謝罪","NOUN",5,"obl","_"],["と","ADP",3,"case","_"],["返金","NOUN",7,"obj","_"],["を","ADP",5,"case","_"],["し","VERB",11,"acl","_"],["て","SCONJ",7,"mark","_"],["いただき","AUX",8,"fixed","_"],["たい","AUX",7,"aux","_"],["気分","NOUN",0,"root","_"],["です","AUX",11,"cop","_"],["。","PUNCT",11,"punct","_"]],
+// ── 接続詞 ──
+conj1:[["しかし","CCONJ",16,"cc","_"],[",","PUNCT",1,"punct","_"],["会社","NOUN",6,"nmod","_"],["の","ADP",3,"case","_"],["業績","NOUN",6,"compound","_"],["向上","NOUN",16,"nsubj","_"],["は","ADP",6,"case","_"],["一時","NOUN",11,"acl","_"],["的","PART",8,"mark","_"],["な","AUX",8,"cop","_"],["もの","NOUN",16,"advcl","_"],["で","AUX",11,"cop","_"],[",","PUNCT",11,"punct","_"],["すぐ","ADV",16,"advmod","_"],["に","ADP",14,"case","_"],["悪化","VERB",0,"root","_"],["し","AUX",16,"aux","_"],["て","SCONJ",16,"mark","_"],["しまい","VERB",18,"fixed","_"],["まし","AUX",16,"aux","_"],["た","AUX",16,"aux","_"],["。","PUNCT",16,"punct","_"]],
+conj2:[["また","ADV",2,"advmod","_"],["行き","VERB",13,"acl","_"],["たい","AUX",2,"aux","_"],["、","PUNCT",2,"punct","_"],["そんな","PRON",6,"nmod","_"],["気持ち","NOUN",8,"obl","_"],["に","ADP",6,"case","_"],["さ","VERB",13,"acl","_"],["せ","AUX",8,"aux","_"],["て","SCONJ",8,"mark","_"],["くれる","VERB",10,"fixed","_"],["お","NOUN",13,"compound","_"],["店","NOUN",0,"root","_"],["です","AUX",13,"cop","_"],["。","PUNCT",13,"punct","_"]],
+conj3:[["Siri","PROPN",6,"nmod","_"],["の","ADP",1,"case","_"],["主要","ADJ",6,"acl","_"],["な","AUX",3,"aux","_"],["技術","NOUN",6,"compound","_"],["領域","NOUN",21,"nsubj","_"],["は","ADP",6,"case","_"],["、","PUNCT",6,"punct","_"],["会話","NOUN",11,"compound","_"],["型","NOUN",11,"compound","_"],["インターフェース","NOUN",15,"nmod","_"],["、","PUNCT",11,"punct","_"],["人的","ADJ",15,"amod","_"],["文脈","NOUN",15,"compound","_"],["認識","NOUN",21,"nmod","_"],["、","PUNCT",15,"punct","_"],["そして","CCONJ",21,"cc","_"],["サービス","NOUN",21,"nmod","_"],["の","ADP",18,"case","_"],["代理","NOUN",21,"compound","_"],["実行","NOUN",0,"root","_"],["で","AUX",21,"cop","_"],["ある","VERB",22,"fixed","_"],["。","PUNCT",21,"punct","_"]],
+conj4:[["宗教","NOUN",4,"advcl","_"],["だ","AUX",1,"cop","_"],["から","SCONJ",1,"mark","_"],["反対","NOUN",7,"obl","_"],["と","ADP",4,"case","_"],["は","ADP",4,"case","_"],["言え","VERB",0,"root","_"],["ない","AUX",7,"aux","Polarity=Neg"],["。","PUNCT",7,"punct","_"]],
+conj5:[["しかも","CCONJ",4,"cc","_"],["感染","NOUN",4,"nsubj","_"],["も","ADP",2,"case","_"],["し","VERB",10,"advcl","_"],["て","SCONJ",4,"mark","_"],["い","VERB",5,"fixed","_"],["て","SCONJ",4,"mark","_"],["歯茎","NOUN",10,"nsubj","_"],["が","ADP",8,"case","_"],["腫れ上がっ","VERB",19,"advcl","_"],["たり","PART",10,"mark","_"],["と","ADP",10,"case","_"],["、","PUNCT",10,"punct","_"],["本当","NOUN",16,"obl","_"],["に","ADP",14,"case","_"],["酷い","ADJ",17,"acl","_"],["目","NOUN",19,"obl","_"],["に","ADP",17,"case","_"],["遭い","VERB",0,"root","_"],["まし","AUX",19,"aux","_"],["た","AUX",19,"aux","_"],["。","PUNCT",19,"punct","_"]],
+conj6:[["ところが","CCONJ",0,"root","_"]],
+conj7:[["つまり","ADV",2,"advmod","_"],["不倫","NOUN",0,"root","_"],["。","PUNCT",2,"punct","_"]],
+conj8:[["ただし","CCONJ",18,"cc","_"],["、","PUNCT",1,"punct","_"],["モチーフ","NOUN",18,"obl","_"],["に","ADP",3,"case","_"],["つい","VERB",4,"fixed","_"],["て","SCONJ",4,"fixed","_"],["公式","NOUN",10,"obl","_"],["に","ADP",7,"case","_"],["は","ADP",7,"case","_"],["発表","VERB",18,"acl","_"],["さ","AUX",10,"aux","_"],["れ","AUX",10,"aux","_"],["て","SCONJ",10,"mark","_"],["い","VERB",13,"fixed","_"],["ない","AUX",10,"aux","Polarity=Neg"],["の","SCONJ",10,"mark","_"],["で","AUX",16,"fixed","_"],["諸説","NOUN",0,"root","_"],["ある","VERB",18,"compound","_"],["。","PUNCT",18,"punct","_"]],
+conj9:[["3","NUM",3,"compound","_"],["ヶ月","NOUN",3,"compound","_"],["先","NOUN",5,"nmod","_"],["の","ADP",3,"case","_"],["見通し","NOUN",16,"nsubj","_"],["は","ADP",5,"case","_"],["、","PUNCT",5,"punct","_"],["さらに","ADV",16,"advmod","_"],["+","NOUN",11,"compound","_"],["1","NUM",11,"nummod","_"],["ポイント","NOUN",16,"obl","_"],["で","ADP",11,"case","_"],["-","NOUN",14,"compound","_"],["4","NUM",16,"obl","_"],["と","ADP",14,"case","_"],["なり","VERB",0,"root","_"],["まし","AUX",16,"aux","_"],["た","AUX",16,"aux","_"],["。","PUNCT",16,"punct","_"]],
+conj10:[["むしろ","ADV",4,"advmod","_"],["メニュー","NOUN",4,"nsubj","_"],["は","ADP",2,"case","_"],["増え","VERB",0,"root","_"],["て","SCONJ",4,"mark","_"],["いる","VERB",5,"fixed","_"],["よう","AUX",4,"aux","_"],["です","AUX",4,"aux","_"],["。","PUNCT",4,"punct","_"]],
+// ── 副詞 ──
+fuku1:[["緊張","VERB",5,"advcl","_"],["し","AUX",1,"aux","_"],["なく","AUX",1,"aux","Polarity=Neg"],["て","SCONJ",1,"mark","_"],["いい","ADJ",6,"acl","_"],["環境","NOUN",15,"nsubj","_"],["は","ADP",6,"case","_"],["上がり","VERB",9,"nmod","_"],["症","NOUN",11,"nmod","_"],["の","ADP",9,"case","_"],["私","PRON",15,"obl","_"],["に","ADP",11,"case","_"],["は","ADP",11,"case","_"],["とても","ADV",15,"advmod","_"],["助かっ","VERB",0,"root","_"],["た","AUX",15,"aux","_"],["。","PUNCT",15,"punct","_"]],
+fuku2:[["で","CCONJ",15,"cc","_"],["も","ADP",1,"fixed","_"],[",","PUNCT",1,"punct","_"],["半日","ADV",5,"advmod","_"],["たっ","VERB",8,"acl","_"],["た","AUX",5,"aux","_"],["現","NOUN",8,"compound","_"],["時点","NOUN",15,"obl","_"],["で","ADP",8,"case","_"],["は","ADP",8,"case","_"],[",","PUNCT",8,"punct","_"],["まだ","ADV",15,"advmod","_"],["連絡","NOUN",15,"nsubj","_"],["は","ADP",13,"case","_"],["あり","VERB",0,"root","_"],["ませ","AUX",15,"aux","_"],["ん","AUX",15,"aux","Polarity=Neg"],["。","PUNCT",15,"punct","_"]],
+fuku3:[["好き","ADJ",3,"acl","_"],["な","AUX",1,"aux","_"],["女性","NOUN",14,"obl","_"],["と","ADP",3,"case","_"],["いっしょ","NOUN",14,"obl","_"],["に","ADP",5,"case","_"],["、","PUNCT",5,"punct","_"],["もう","ADV",10,"advmod","_"],["何","NUM",10,"nummod","_"],["年","NOUN",12,"nsubj","_"],["も","ADP",10,"case","_"],["まえ","NOUN",14,"obl","_"],["から","ADP",12,"case","_"],["通っ","VERB",17,"acl","_"],["て","SCONJ",14,"mark","_"],["いる","VERB",15,"fixed","_"],["定宿","NOUN",0,"root","_"],["です","AUX",17,"cop","_"],["。","PUNCT",17,"punct","_"]],
+fuku4:[["今","NOUN",3,"nmod","_"],["の","ADP",1,"case","_"],["日本","PROPN",5,"nmod","_"],["の","ADP",3,"case","_"],["社会","NOUN",11,"obl","_"],["に","ADP",5,"case","_"],["は","ADP",5,"case","_"],["カルチャー","NOUN",11,"nsubj","_"],["が","ADP",8,"case","_"],["全く","ADV",11,"advmod","_"],["ない","ADJ",0,"root","_"],["。","PUNCT",11,"punct","_"]],
+fuku5:[["握り","NOUN",3,"obl","_"],["と","ADP",1,"case","_"],["巻物","NOUN",5,"obj","_"],["を","ADP",3,"case","_"],["頼み","VERB",17,"advcl","_"],["まし","AUX",5,"aux","_"],["た","AUX",5,"aux","_"],["が","SCONJ",5,"mark","_"],["、","PUNCT",5,"punct","_"],["値段","NOUN",12,"obj","_"],["を","ADP",10,"case","_"],["考えれ","VERB",17,"advcl","_"],["ば","SCONJ",12,"mark","_"],["リピート","NOUN",17,"nsubj","_"],["は","ADP",14,"case","_"],["たぶん","ADV",17,"advmod","_"],["あり","VERB",0,"root","_"],["ませ","AUX",17,"aux","_"],["ん","AUX",17,"aux","Polarity=Neg"],["。","PUNCT",17,"punct","_"]],
+fuku6:[["子ども","NOUN",2,"compound","_"],["たち","NOUN",4,"obl","_"],["と","ADP",2,"case","_"],["一緒","NOUN",17,"advcl","_"],["だっ","AUX",4,"cop","_"],["た","AUX",4,"aux","_"],["けど","SCONJ",4,"mark","_"],["、","PUNCT",4,"punct","_"],["お","NOUN",10,"compound","_"],["店","NOUN",12,"nmod","_"],["の","ADP",10,"case","_"],["人","NOUN",14,"nsubj","_"],["が","ADP",12,"case","_"],["優しく","ADJ",17,"advcl","_"],["て","SCONJ",14,"mark","_"],["ゆっくり","ADV",17,"advmod","_"],["出来","VERB",0,"root","_"],["まし","AUX",17,"aux","_"],["た","AUX",17,"aux","_"],["!","PUNCT",17,"punct","_"]],
+// ── 終助詞 ──
+sfp1:[["親切","ADJ",5,"advcl","_"],["に","AUX",1,"aux","_"],["下見","NOUN",5,"obj","_"],["を","ADP",3,"case","_"],["し","VERB",0,"root","_"],["て","SCONJ",5,"mark","_"],["いただき","AUX",6,"fixed","_"],["まし","AUX",5,"aux","_"],["た","AUX",5,"aux","_"],["よ","PART",5,"mark","_"],["!","PUNCT",5,"punct","_"]],
+sfp2:[["単に","ADV",4,"advmod","_"],["好み","NOUN",4,"nmod","_"],["の","ADP",2,"case","_"],["問題","NOUN",0,"root","_"],["か","ADP",4,"case","_"],["も","ADP",4,"case","_"],["ね","PART",4,"mark","_"],["。","PUNCT",4,"punct","_"]],
+sfp3:[["そんな","PRON",2,"nmod","_"],["こと","NOUN",4,"obl","_"],["で","ADP",2,"case","_"],["許さ","VERB",0,"root","_"],["れる","AUX",4,"aux","_"],["の","SCONJ",4,"mark","_"],["でしょう","AUX",6,"fixed","_"],["か","PART",4,"mark","_"],["?","PUNCT",4,"punct","_"]],
+sfp4:[["そんな","PRON",3,"nmod","_"],["記念","NOUN",3,"compound","_"],["日","NOUN",5,"obj","_"],["を","ADP",3,"case","_"],["祝っ","VERB",7,"advcl","_"],["て","SCONJ",5,"mark","_"],["発売","VERB",17,"advcl","_"],["さ","AUX",7,"aux","_"],["れ","AUX",7,"aux","_"],["た","AUX",7,"aux","_"],[",","PUNCT",7,"punct","_"],["“","PUNCT",13,"punct","_"],["永遠","NOUN",17,"obl","_"],["に","ADP",13,"case","_"],["勧誘","NOUN",16,"compound","_"],["活動","NOUN",17,"obl","_"],["がんばる","VERB",0,"root","_"],["ぞ","PART",17,"mark","_"],["!","PUNCT",17,"punct","_"],["”","PUNCT",17,"punct","_"]],
+sfp5:[["言う","VERB",2,"acl","_"],["こと","NOUN",7,"obl","_"],["だけ","ADP",2,"case","_"],["は","ADP",2,"case","_"],["随分","ADV",7,"advmod","_"],["と","ADP",5,"case","_"],["正しい","ADJ",20,"advcl","_"],["が","SCONJ",7,"mark","_"],[",","PUNCT",7,"punct","_"],["自分","NOUN",12,"nmod","_"],["の","ADP",10,"case","_"],["やっ","VERB",15,"acl","_"],["て","SCONJ",12,"mark","_"],["いる","VERB",13,"fixed","_"],["こと","NOUN",20,"nsubj","_"],["は","ADP",15,"case","_"],["まるっきり","ADV",20,"advmod","_"],["反","NOUN",20,"compound","Polarity=Neg"],["革命","NOUN",20,"compound","_"],["家","NOUN",0,"root","_"],["じゃ","AUX",20,"cop","_"],["ない","AUX",21,"fixed","_"],["の","PART",20,"mark","_"],["。","PUNCT",20,"punct","_"]],
+sfp6:[["名前","NOUN",3,"nmod","_"],["の","ADP",1,"case","_"],["通り","NOUN",6,"obl","_"],["本当","NOUN",6,"obl","_"],["に","ADP",4,"case","_"],["リラックス","VERB",8,"acl","_"],["できる","AUX",6,"aux","_"],["ホテル","NOUN",12,"advcl","_"],["だ","AUX",8,"cop","_"],["なぁ","PART",8,"mark","_"],["と","ADP",8,"case","_"],["思い","VERB",0,"root","_"],["まし","AUX",12,"aux","_"],["た","AUX",12,"aux","_"],["。","PUNCT",12,"punct","_"]],
+};
+// Helper to convert GOLD to arc format
+function goldArc(id){
+  const g=GOLD[id];if(!g)return[];
+  return g.map(t=>({text:t[0],upos:t[1],head:t[2],deprel:t[3],feats:t[4]&&t[4]!=="_"?t[4].split("|"):[]}));
+}
+let S={batch:0,idx:0,view:"annotate",ann:{},modal:null};
+function items(){return BATCHES[S.batch].items}
+function cur(){return items()[S.idx]}
+function ann(id){
+  if(!S.ann[id])S.ann[id]={phon:"",phon_deep:"",gloss:"",notes:"",done:false,ov:{}};
+  return S.ann[id];
+}
+// Get v2 words: use deep form if available, else surface
+function v2words(a){
+  const src=(a.phon_deep&&a.phon_deep.trim())?a.phon_deep:a.phon;
+  if(!src)return[];
+  return src.trim().split(/[\s=]+/).filter(Boolean);
+}
+function v2surfaceWords(a){
+  if(!a.phon)return[];
+  return a.phon.trim().split(/[\s=]+/).filter(Boolean);
+}
+function hasDeepPhon(a){ return !!(a.phon_deep && a.phon_deep.trim()); }
+function v2glosses(a){
+  if(!a.gloss)return[];
+  return a.gloss.trim().split(/[\s=]+/).filter(Boolean);
+}
+// Per-word resolved values
+function wordData(a){
+  const ws=v2words(a),gs=v2glosses(a),out=[];
+  for(let i=0;i<ws.length;i++){
+    const g=gs[i]||"";const ov=a.ov[i]||{};
+    const autoU=autoUpos(g);const autoD=autoDeprel(g,ov.upos||autoU);const autoF=glossToWordFeats(g);
+    out.push({
+      phon:ws[i],gloss:g,
+      surface_phon:"",  // not used for arc; surface shown separately
+      upos:ov.upos||autoU||"",deprel:ov.deprel||autoD||"",
+      head:ov.head!=null?ov.head:0,
+      feats:ov.feats||autoF,
+      extpos:ov.extpos||"",
+      autoUpos:autoU,autoDeprel:autoD,autoFeats:autoF,
+      hasOvUpos:!!ov.upos,hasOvDeprel:!!ov.deprel,hasOvFeats:!!ov.feats,hasOvHead:ov.head!=null,
+      hasExtpos:!!ov.extpos
+    });
+  }
+  return out;
+}
+
+// ═══════════════════════════════════
+// SAVE / LOAD
+// ═══════════════════════════════════
+function saveJSON(){
+  const d={_meta:{tool:"UDJ-v2-annotator",version:"2.0",saved:new Date().toISOString()},
+    batches:BATCHES.map(b=>({id:b.id,label:b.label,
+      items:b.items.map(it=>({id:it.id,suw:it.suw,udj:it.udj,example:it.example,note:it.note,ctx:it.ctx||null,annotation:S.ann[it.id]||null}))}))};
+  const bl=new Blob([JSON.stringify(d,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(bl);a.download="udj_v2_annotations.json";a.click();
+}
+function loadJSON(){
+  const inp=document.createElement("input");inp.type="file";inp.accept=".json";
+  inp.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
+    r.onload=ev=>{try{const d=JSON.parse(ev.target.result);
+      if(d.batches)for(const b of d.batches){const lb=BATCHES.find(x=>x.id===b.id);
+        for(const it of b.items){if(it.annotation)S.ann[it.id]=it.annotation;
+          if(lb&&!lb.items.find(x=>x.id===it.id))lb.items.push({id:it.id,suw:it.suw,udj:it.udj,example:it.example,note:it.note,ctx:it.ctx||null});}
+        if(!lb)BATCHES.push({id:b.id,label:b.label,items:b.items.map(it=>({id:it.id,suw:it.suw,udj:it.udj,example:it.example,note:it.note,ctx:it.ctx||null}))});
+      }render()}catch(err){alert("JSON読み込みエラー: "+err.message)}};r.readAsText(f)};inp.click();
+}
+
+// ═══════════════════════════════════
+// SVG ARC DIAGRAM
+// ═══════════════════════════════════
+
+// ═══════════════════════════════════
+// UD SYNTAX VALIDATION
+// ═══════════════════════════════════
+// Based on: https://universaldependencies.org/u/overview/syntax.html
+// and: https://github.com/UniversalDependencies/tools/blob/master/validate.py
+
+function validateUD(wd){
+  const alerts=[];
+  if(!wd.length)return alerts;
+  const a=(lvl,msg,rule)=>alerts.push({level:lvl,msg:msg,rule:rule});
+
+  // Build lookup
+  const byIdx={};wd.forEach((w,i)=>byIdx[i+1]=w);
+  const childrenOf={};wd.forEach((w,i)=>{const h=w.head;if(!childrenOf[h])childrenOf[h]=[];childrenOf[h].push({idx:i+1,...w})});
+
+  // === Rule 1: Exactly one root ===
+  const roots=wd.filter(w=>w.head===0);
+  if(roots.length===0) a('error','rootが未設定です','R1: tree must have root');
+  if(roots.length>1) a('error',`rootが${roots.length}個あります（1つだけにしてください）`,'R1: single root');
+
+  // === Rule 2: root deprel must be "root" ===
+  wd.forEach((w,i)=>{
+    if(w.head===0 && w.deprel && w.deprel!=='root') a('warn',`#${i+1} ${w.phon}: head=0 なのに deprel="${w.deprel}"（rootであるべき）`,'R2: root deprel');
+    if(w.deprel==='root' && w.head!==0) a('warn',`#${i+1} ${w.phon}: deprel=root なのに head≠0`,'R2: root head');
+  });
+
+  // === Rule 3: UPOS-deprel compatibility ===
+  wd.forEach((w,i)=>{
+    const u=w.upos,d=w.deprel,ep=w.extpos;if(!u||!d||d==='root')return;
+    const eff=ep||u; // effective UPOS for ExtPOS-bearing tokens
+
+    // case → should be ADP (or ExtPos=ADP)
+    if(d==='case' && eff!=='ADP' && u!=='ADP')
+      a('warn',`#${i+1} ${w.phon}: deprel=case だが UPOS=${u}（通常ADP）`,'R3a: case→ADP');
+
+    // mark → should be SCONJ or PART (or ExtPos=SCONJ)
+    if(d==='mark' && eff!=='SCONJ' && eff!=='PART' && u!=='SCONJ' && u!=='PART')
+      a('warn',`#${i+1} ${w.phon}: deprel=mark だが UPOS=${u}（通常SCONJ）`,'R3b: mark→SCONJ');
+
+    // aux → should be AUX
+    if(d==='aux' && u!=='AUX')
+      a('warn',`#${i+1} ${w.phon}: deprel=aux だが UPOS=${u}（AUXであるべき）`,'R3c: aux→AUX');
+
+    // cop → should be AUX
+    if(d==='cop' && u!=='AUX')
+      a('warn',`#${i+1} ${w.phon}: deprel=cop だが UPOS=${u}（AUXであるべき）`,'R3d: cop→AUX');
+
+    // det → should be DET (or PRON in some cases)
+    if(d==='det' && u!=='DET' && u!=='PRON')
+      a('warn',`#${i+1} ${w.phon}: deprel=det だが UPOS=${u}（通常DET）`,'R3e: det→DET');
+
+    // advmod → should be ADV, ADJ, CCONJ, DET, PART
+    if(d==='advmod' && !/^(ADV|ADJ|CCONJ|DET|PART|SYM)$/.test(u))
+      a('warn',`#${i+1} ${w.phon}: deprel=advmod だが UPOS=${u}（通常ADV等）`,'R3f: advmod→ADV');
+
+    // nummod → should be NUM or NOUN
+    if(d==='nummod' && !/^(NUM|NOUN|SYM)$/.test(u))
+      a('warn',`#${i+1} ${w.phon}: deprel=nummod だが UPOS=${u}（通常NUM）`,'R3g: nummod→NUM');
+
+    // PUNCT must be punct
+    if(u==='PUNCT' && d!=='punct')
+      a('error',`#${i+1} ${w.phon}: UPOS=PUNCT なのに deprel="${d}"（punctであるべき）`,'R3h: PUNCT→punct');
+
+    // punct must be PUNCT
+    if(d==='punct' && u!=='PUNCT' && u!=='SYM')
+      a('warn',`#${i+1} ${w.phon}: deprel=punct だが UPOS=${u}（PUNCTであるべき）`,'R3i: punct→PUNCT');
+  });
+
+  // === Rule 4: Function words should be leaves (no dependents) ===
+  // "Pure function words" = AUX with aux/cop, ADP with case, DET with det
+  // Exception: fixed, conj, cc, advmod(negation), punct
+  const pureFuncDeprels=new Set(['aux','cop','case','det']);
+  const allowedChildDeprels=new Set(['fixed','conj','cc','punct','goeswith','reparandum']);
+  wd.forEach((w,i)=>{
+    if(!pureFuncDeprels.has(w.deprel))return;
+    const myId=i+1;
+    const kids=(childrenOf[myId]||[]);
+    const badKids=kids.filter(k=>{
+      if(allowedChildDeprels.has(k.deprel))return false;
+      // Allow advmod if it's negation
+      if(k.deprel==='advmod'){
+        const hasNeg=k.feats&&k.feats.some(f=>f==='Polarity=Neg');
+        if(hasNeg)return false;
+      }
+      return true;
+    });
+    if(badKids.length){
+      const bstr=badKids.map(k=>`${k.phon}(${k.deprel})`).join(', ');
+      a('warn',`#${myId} ${w.phon} (${w.deprel}): 機能語に従属語 [${bstr}] あり。機能語は原則leafであるべき`,'R4: func word leaf');
+    }
+  });
+
+  // === Rule 5: fixed children must have no dependents ===
+  wd.forEach((w,i)=>{
+    if(w.deprel!=='fixed')return;
+    const myId=i+1;
+    const kids=(childrenOf[myId]||[]).filter(k=>k.deprel!=='punct'&&k.deprel!=='goeswith'&&k.deprel!=='reparandum');
+    if(kids.length){
+      const kstr=kids.map(k=>`${k.phon}(${k.deprel})`).join(', ');
+      a('error',`#${myId} ${w.phon} (fixed): 従属語 [${kstr}] あり。fixed子ノードは依存を持てない`,'R5: fixed no deps');
+    }
+  });
+
+  // === Rule 6: At most one obj per head ===
+  for(const[hid,kids] of Object.entries(childrenOf)){
+    const objs=kids.filter(k=>k.deprel==='obj');
+    if(objs.length>1){
+      const ostr=objs.map(k=>`#${k.idx} ${k.phon}`).join(', ');
+      a('warn',`head=${hid} に obj が ${objs.length}個: [${ostr}]（最大1つ）`,'R6: max 1 obj');
+    }
+  }
+
+  // === Rule 7: No cycles (self-loop) ===
+  wd.forEach((w,i)=>{
+    if(w.head===i+1) a('error',`#${i+1} ${w.phon}: 自己ループ（head=自分）`,'R7: self-loop');
+  });
+
+  // === Rule 8: head index in range ===
+  wd.forEach((w,i)=>{
+    if(w.head<0||w.head>wd.length)
+      a('error',`#${i+1} ${w.phon}: head=${w.head} は範囲外（0〜${wd.length}）`,'R8: head range');
+  });
+
+  // === Rule 9: Auxiliaries should be flat (siblings, not chained) ===
+  // If AUX1 depends on AUX2 which depends on VERB, that's wrong —
+  // both should depend directly on VERB
+  wd.forEach((w,i)=>{
+    if((w.deprel==='aux'||w.deprel==='cop')&&w.head>0){
+      const head=byIdx[w.head];
+      if(head&&(head.deprel==='aux'||head.deprel==='cop')){
+        a('warn',`#${i+1} ${w.phon} (${w.deprel}): AUXがAUXに依存。補助動詞は全て内容語に直接つくべき（フラット構造）`,'R9: aux flat');
+      }
+    }
+  });
+
+  // === Rule 10: Content word primacy — nsubj/obj/obl should be content words ===
+  const contentDeprels=new Set(['nsubj','obj','iobj','obl','nmod','appos']);
+  const funcUpos=new Set(['AUX','ADP','SCONJ','CCONJ','PART','DET']);
+  wd.forEach((w,i)=>{
+    if(contentDeprels.has(w.deprel)&&funcUpos.has(w.upos)&&!w.extpos){
+      a('info',`#${i+1} ${w.phon}: deprel=${w.deprel} に機能語UPOS=${w.upos}。通常は内容語（ExtPOS設定で解決可能）`,'R10: content primacy');
+    }
+  });
+
+  // === Rule 11: cop should not be the root ===
+  wd.forEach((w,i)=>{
+    if(w.deprel==='cop'&&w.head>0){
+      const head=byIdx[w.head];
+      // cop's head should ideally be the predicate nominal/adjective, not a verb
+      // But mainly: the copula itself should not be root
+    }
+    if(w.deprel==='root'&&w.upos==='AUX'){
+      a('info',`#${i+1} ${w.phon}: AUXがroot。コピュラ構文では名詞/形容詞述語がrootであるべき`,'R11: cop not root');
+    }
+  });
+
+  return alerts;
+}
+
+function renderAlerts(alerts){
+  if(!alerts.length)return'<div class="ud-alerts"><div class="ud-alert info"><span class="al-icon">✓</span> UD syntax検証: 問題なし</div></div>';
+  const icons={error:'🚫',warn:'⚠️',info:'💡'};
+  const h=alerts.map(a=>`<div class="ud-alert ${a.level}"><span class="al-icon">${icons[a.level]||'•'}</span><span>${a.msg} <span class="al-rule">${a.rule}</span></span></div>`).join('');
+  return`<div class="ud-alerts"><div style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:var(--fg3);margin-bottom:4px">UD syntax検証: ${alerts.filter(a=>a.level==='error').length}エラー / ${alerts.filter(a=>a.level==='warn').length}警告 / ${alerts.filter(a=>a.level==='info').length}情報</div>${h}</div>`;
+}
+
+// ═══════════════════════════════════
+// SVG → IMAGE COPY
+// ═══════════════════════════════════
+async function copySvgAsImage(boxId){
+  const box=document.getElementById(boxId);if(!box)return;
+  const svg=box.querySelector('svg');if(!svg)return;
+  const btn=box.querySelector('.arc-copy-btn');
+  // Fixed palette: white bg, black text, colored arcs
+  const isGold=boxId==='arc-gold';
+  const PAL={
+    bg:'#ffffff',
+    fg:'#111111',        // main word text
+    fg2:'#444444',       // UPOS labels
+    fg3:'#666666',       // dim text
+    arc:isGold?'#2563eb':'#dc2626',  // blue for gold, red for v2
+    root:'#16a34a',      // green for root
+    feat:'#15803d',      // green for features
+    extbox:'#d97706',    // orange for ExtPOS
+    exttext:'#b45309',
+  };
+  try{
+    const clone=svg.cloneNode(true);
+    clone.querySelectorAll('text,line,path,polygon,rect').forEach(el=>{
+      const tag=el.tagName;
+      const curFill=(el.getAttribute('fill')||'').trim();
+      const curStroke=(el.getAttribute('stroke')||'').trim();
+      // Resolve var() references
+      const isVar=s=>s.startsWith('var(');
+      // Text coloring
+      if(tag==='text'){
+        const fs=parseFloat(el.getAttribute('font-size')||'12');
+        if(curFill.includes('5cb87a')||curFill.includes('15803d')||curFill.includes('root')){
+          // green: root label or features
+          el.setAttribute('fill',fs<=8?PAL.feat:PAL.root);
+        } else if(curFill.includes('d29922')||curFill.includes('d97706')||curFill.includes('b45309')){
+          // orange: ExtPOS
+          el.setAttribute('fill',PAL.exttext);
+        } else if(curFill.includes('9b59b6')){
+          // purple: deep phon
+          el.setAttribute('fill','#7c3aed');
+        } else if(curFill.includes('d95f5f')||curFill.includes('5b9bd5')){
+          // arc color label
+          el.setAttribute('fill',PAL.arc);
+        } else if(isVar(curFill)){
+          // CSS variable: resolve by name
+          if(curFill.includes('fg3'))el.setAttribute('fill',PAL.fg2);
+          else if(curFill.includes('fg'))el.setAttribute('fill',PAL.fg);
+          else el.setAttribute('fill',PAL.fg);
+        } else if(!curFill||curFill==='none'){
+          // default
+        }
+      }
+      // Arcs and lines
+      if(tag==='path'||tag==='line'){
+        if(curStroke.includes('5cb87a'))el.setAttribute('stroke',PAL.root);
+        else if(curStroke)el.setAttribute('stroke',PAL.arc);
+      }
+      // Polygons (arrowheads)
+      if(tag==='polygon'){
+        if(curFill.includes('5cb87a'))el.setAttribute('fill',PAL.root);
+        else if(curFill)el.setAttribute('fill',PAL.arc);
+      }
+      // Rects (ExtPOS box)
+      if(tag==='rect'){
+        if(curFill.includes('d29922'))el.setAttribute('fill','rgba(217,119,6,.12)');
+        if(curStroke&&curStroke.includes('d29922'))el.setAttribute('stroke',PAL.extbox);
+      }
+    });
+    // White background
+    const bg=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    bg.setAttribute('width','100%');bg.setAttribute('height','100%');
+    bg.setAttribute('fill',PAL.bg);
+    clone.insertBefore(bg,clone.firstChild);
+    // Render
+    const xml=new XMLSerializer().serializeToString(clone);
+    const blob=new Blob([xml],{type:'image/svg+xml;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const img=new Image();
+    img.onload=async()=>{
+      const scale=2;
+      const c=document.createElement('canvas');
+      c.width=img.width*scale;c.height=img.height*scale;
+      const ctx=c.getContext('2d');
+      ctx.fillStyle=PAL.bg;ctx.fillRect(0,0,c.width,c.height);
+      ctx.drawImage(img,0,0,c.width,c.height);
+      URL.revokeObjectURL(url);
+      try{
+        const pngBlob=await new Promise(r=>c.toBlob(r,'image/png'));
+        await navigator.clipboard.write([new ClipboardItem({'image/png':pngBlob})]);
+        if(btn){btn.textContent='✓ copied';btn.classList.add('copied');setTimeout(()=>{btn.textContent='📋 copy';btn.classList.remove('copied')},1500);}
+      }catch(e){
+        c.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=boxId+'.png';a.click();},'image/png');
+        if(btn){btn.textContent='↓ saved';setTimeout(()=>{btn.textContent='📋 copy'},1500);}
+      }
+    };
+    img.src=url;
+  }catch(e){console.error('copySvg error:',e);if(btn){btn.textContent='✗ error';setTimeout(()=>{btn.textContent='📋 copy'},1500);}}
+}
+
+function arcSvg(words,label,color){
+  const n=words.length;if(!n)return"";
+  const cw=Math.max(82,Math.min(130,800/n)),pad=16;
+  const W=cw*n+pad*2;
+  let maxArcH=0;words.forEach((w,i)=>{if(w.head>0&&w.head<=n){const d=Math.abs(w.head-1-i);maxArcH=Math.max(maxArcH,d*16+22)}});
+  const wordY=Math.max(90, maxArcH+50);
+  const hasExtpos=words.some(w=>w.extpos);const H=wordY+(hasExtpos?50:36)+4;const arcBase=wordY-22;
+  const c=color||"#5b9bd5";
+  let s=`<svg width="${W}" height="${H}" style="font-family:'IBM Plex Mono',monospace;display:block">`;
+  s+=`<text x="${pad}" y="12" fill="${c}" font-size="9" font-weight="600">${label}</text>`;
+  // arcs
+  words.forEach((w,i)=>{
+    const x=pad+cw*i+cw/2;
+    if(w.head===0&&w.deprel==="root"){
+      s+=`<line x1="${x}" y1="18" x2="${x}" y2="${arcBase}" stroke="#5cb87a" stroke-width="1.5"/>`;
+      s+=`<polygon points="${x-3},${arcBase-6} ${x+3},${arcBase-6} ${x},${arcBase}" fill="#5cb87a"/>`;
+      s+=`<text x="${x}" y="17" text-anchor="middle" fill="#5cb87a" font-size="8">root</text>`;
+    } else if(w.head>0&&w.head<=n){
+      const hi=w.head-1,fx=pad+cw*hi+cw/2,tx=x;
+      const dist=Math.abs(hi-i),arcH=dist*16+22;
+      const mx=(fx+tx)/2,ty=arcBase-arcH;
+      s+=`<path d="M${fx},${arcBase} Q${mx},${ty} ${tx},${arcBase}" fill="none" stroke="${c}" stroke-width="1.2"/>`;
+      s+=`<polygon points="${tx-3},${arcBase-5} ${tx+3},${arcBase-5} ${tx},${arcBase}" fill="${c}"/>`;
+      if(w.deprel)s+=`<text x="${mx}" y="${ty-3}" text-anchor="middle" fill="${c}" font-size="8">${w.deprel}</text>`;
+    }
+  });
+  // words
+  words.forEach((w,i)=>{
+    const x=pad+cw*i+cw/2;
+    s+=`<text x="${x}" y="${wordY}" text-anchor="middle" fill="var(--fg)" font-size="12" font-weight="500">${w.text}</text>`;
+    if(w.extpos){
+      // ExtPOS set: show UPOS dimmed + ExtPOS in orange box
+      s+=`<text x="${x}" y="${wordY+13}" text-anchor="middle" fill="var(--fg3)" font-size="8" text-decoration="line-through" opacity=".5">${w.upos||""}</text>`;
+      s+=`<rect x="${x-18}" y="${wordY+16}" width="36" height="14" rx="3" fill="#d29922" opacity=".15" stroke="#d29922" stroke-width=".8"/>`;
+      s+=`<text x="${x}" y="${wordY+26}" text-anchor="middle" fill="#d29922" font-size="9" font-weight="700">${w.extpos}</text>`;
+      if(w.feats&&w.feats.length){
+        const fs=w.feats.join(", ");
+        s+=`<text x="${x}" y="${wordY+40}" text-anchor="middle" fill="#5cb87a" font-size="7">${fs}</text>`;
+      }
+    } else {
+      s+=`<text x="${x}" y="${wordY+14}" text-anchor="middle" fill="var(--fg3)" font-size="9">${w.upos||""}</text>`;
+      if(w.feats&&w.feats.length){
+        const fs=w.feats.join(", ");
+        s+=`<text x="${x}" y="${wordY+26}" text-anchor="middle" fill="#5cb87a" font-size="7">${fs}</text>`;
+      }
+    }
+  });
+  s+=`</svg>`;return s;
+}
+
+// ═══════════════════════════════════
+// MERGE DIAGRAM
+// ═══════════════════════════════════
+function mergeSvg(udjTokens,v2w){
+  if(!udjTokens.length||!v2w.length)return"";
+  const nu=udjTokens.length,nv=v2w.length;
+  const cw=Math.max(60,Math.min(100,800/Math.max(nu,nv))),pad=16;
+  const W=Math.max(cw*nu,cw*nv)+pad*2;
+  const uy=28,vy=80,H=100;
+  let s=`<svg width="${W}" height="${H}" style="font-family:'IBM Plex Mono',monospace;display:block">`;
+  // UDJ tokens
+  udjTokens.forEach((t,i)=>{
+    const x=pad+cw*i+cw/2;
+    s+=`<text x="${x}" y="${uy}" text-anchor="middle" fill="var(--fg3)" font-size="11">${t}</text>`;
+  });
+  // v2 tokens
+  v2w.forEach((w,i)=>{
+    const x=pad+cw*i+cw/2;
+    s+=`<text x="${x}" y="${vy}" text-anchor="middle" fill="var(--acc2)" font-size="11" font-weight="500">${w}</text>`;
+  });
+  // merge lines (simple: assume left-aligned, v2 words absorb consecutive UDJ tokens)
+  // This is a heuristic — content words map 1:1, merged function words map many:1
+  // We draw lines from each UDJ token to the nearest v2 word by index
+  let uIdx=0;
+  v2w.forEach((w,vi)=>{
+    const parts=w.split("-");
+    const span=Math.max(1,parts.length>1?countMergedSuw(w,udjTokens,uIdx):1);
+    const vx=pad+cw*vi+cw/2;
+    for(let j=0;j<span&&uIdx<nu;j++,uIdx++){
+      const ux=pad+cw*uIdx+cw/2;
+      s+=`<line x1="${ux}" y1="${uy+6}" x2="${vx}" y2="${vy-14}" stroke="var(--bd2)" stroke-width="1" stroke-dasharray="3,2"/>`;
+    }
+  });
+  // labels
+  s+=`<text x="${pad}" y="${uy-10}" fill="var(--fg3)" font-size="8" font-weight="600">UDJ</text>`;
+  s+=`<text x="${pad}" y="${vy+16}" fill="var(--acc)" font-size="8" font-weight="600">v2</text>`;
+  s+=`</svg>`;return s;
+}
+function countMergedSuw(phon,udj,startIdx){
+  // heuristic: count how many UDJ tokens this v2 word covers
+  // For now return 1 (user can verify visually)
+  return 1;
+}
+
+// ═══════════════════════════════════
+// RENDER
+// ═══════════════════════════════════
+function render(){
+  const app=document.getElementById("app");const its=items(),it=cur(),a=ann(it.id);
+  const total=BATCHES.reduce((s,b)=>s+b.items.length,0);
+  const done=BATCHES.reduce((s,b)=>s+b.items.filter(x=>(S.ann[x.id]||{}).done).length,0);
+  app.innerHTML=`
+  <header><h1>UDJ v2 アノテーション<span>v2.0</span></h1>
+    <div class="hdr-btns"><button onclick="loadJSON()">📂 読み込み</button><button class="primary" onclick="saveJSON()">💾 保存</button></div></header>
+  <div class="batch-bar">${BATCHES.map((b,i)=>{const d=b.items.filter(x=>(S.ann[x.id]||{}).done).length;
+    return`<button class="batch-btn ${S.batch===i?'active':''}" onclick="S.batch=${i};S.idx=0;render()">${b.label}<span class="batch-count">${d}/${b.items.length}</span></button>`}).join("")}</div>
+  <div class="view-tog">
+    <button class="vt-btn ${S.view==='annotate'?'active':''}" onclick="S.view='annotate';render()">アノテーション</button>
+    <button class="vt-btn ${S.view==='summary'?'active':''}" onclick="S.view='summary';render()">一覧</button></div>
+  ${S.view==="annotate"?renderAnnotate(its,it,a):renderSummary(its)}
+  <div style="margin-top:16px;padding-top:8px;border-top:1px solid var(--bd)">
+    <div class="progress-info"><span>全体: ${done}/${total}</span><span>バッチ: ${its.filter(x=>(S.ann[x.id]||{}).done).length}/${its.length}</span></div></div>
+  ${S.modal?renderModal():""}`;
+  // Restore focus to feat search input after re-render
+  if(S.modal&&S.modal.type==="feat"&&S.modal.q!=null){
+    requestAnimationFrame(()=>{const el=document.getElementById("feat-search-input");if(el){el.focus();el.selectionStart=el.selectionEnd=el.value.length}});
+  }
+}
+
+function renderGoldTable(id){
+  const g=GOLD[id];
+  if(!g)return'<div style="color:var(--fg3);font-size:.72rem">（Gold データなし）</div>';
+  let h=`<table class="gold-table"><thead><tr><th>#</th><th>形態素</th><th>UPOS</th><th>head</th><th>deprel</th><th>feats</th></tr></thead><tbody>`;
+  g.forEach((t,i)=>{
+    h+=`<tr>
+      <td class="gidx">${i+1}</td>
+      <td class="gform">${t[0]}</td>
+      <td class="gupos">${t[1]}</td>
+      <td class="gdep">${t[2]===0?'0 (root)':t[2]+' ('+g[t[2]-1][0]+')'}</td>
+      <td class="gdep">${t[3]}</td>
+      <td class="gfeat">${t[4]&&t[4]!=="_"?t[4]:"—"}</td>
+    </tr>`;
+  });
+  h+=`</tbody></table>`;
+  return h;
+}
+
+function renderAnnotate(its,it,a){
+  const pips=its.map((x,i)=>{const aa=S.ann[x.id]||{};const c=aa.done?"done":(aa.phon||aa.gloss)?"partial":"";
+    return`<div class="pip ${c} ${i===S.idx?'active':''}" onclick="S.idx=${i};render()" title="#${i+1} ${x.example}"></div>`}).join("");
+  const wd=wordData(a);
+  const v2w=v2words(a);
+  // v2 arc data
+  const v2Arc=wd.map((w,i)=>({text:w.phon,upos:w.upos,extpos:w.extpos,deprel:w.deprel,head:w.head,feats:w.feats}));
+  const warnAlign=v2w.length&&v2glosses(a).length&&v2w.length!==v2glosses(a).length;
+
+  return`
+  <div class="progress-bar">${pips}</div>
+  <div class="card">
+    <div class="sent-num">#${S.idx+1}/${its.length} — ${BATCHES[S.batch].label}</div>
+    <div class="sent-ja">${it.example}</div>
+    <div class="sent-suw">UDJ SUW: ${it.udj.map(s=>`<span class="suw">${s}</span>`).join(" ")}</div>
+    ${it.ctx?`<div style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--fg3);margin:4px 0;padding:4px 8px;background:var(--bg2);border-radius:4px;border-left:3px solid var(--acc)"><span style="color:var(--acc);font-weight:500">${it.ctx.sid||it.ctx}</span> ${it.ctx.text||""}</div>`:""}${it.note?`<div class="sent-note">${it.note}</div>`:""}
+  </div>
+  <div class="card">
+    <div class="card-title" style="color:var(--red)">UDJ 原文アノテーション（正解） <span style="font-weight:400;opacity:.5;font-size:.6rem">— GSD準拠: feats=Polarity=Negのみ (Tense等なし)</span></div>
+    ${renderGoldTable(it.id)}
+  </div>
+  <div class="card">
+    <div class="card-title">入力</div>
+    <div class="field"><div class="field-label">表層音韻<span class="hint">スペース/= → 語境界　- → 形態素境界</span></div>
+      <input id="f_phon" value="${esc(a.phon)}" oninput="updField('phon',this.value)" style="${hasDeepPhon(a)?'border-color:var(--acc2);opacity:.7':''}"></div>
+    <div class="field"><div class="field-label">基底音韻<span class="hint">任意。融合形の分析表記。あればグロスはこちらに対応</span>${hasDeepPhon(a)?'<span style="color:#d29922;font-size:.6rem;margin-left:6px">● 基底モード: グロスは基底に対応</span>':''}</div>
+      <input id="f_phon_deep" value="${esc(a.phon_deep||'')}" oninput="updField('phon_deep',this.value)" style="${hasDeepPhon(a)?'border-color:#d29922':'border-color:var(--bd);opacity:.5'}" placeholder="例: si-te simaw-u（融合形がなければ空欄）"></div>
+    <div class="field"><div class="field-label">グロス<span class="hint">${hasDeepPhon(a)?'基底音韻と同数の語で':'表層音韻と同数の語で'}</span></div>
+      <input id="f_gloss" value="${esc(a.gloss)}" oninput="updField('gloss',this.value)"></div>
+    <div class="field"><div class="field-label">ノート</div>
+      <textarea id="f_notes" oninput="updField('notes',this.value)" rows="1">${esc(a.notes)}</textarea></div>
+    ${warnAlign?`<div class="warn-msg">⚠ ${hasDeepPhon(a)?"基底音韻":"表層音韻"}とグロスの語数が不一致</div>`:""}
+  </div>
+  <div class="card" id="detail-card">
+    <div class="card-title">語の詳細 <span style="font-weight:400;opacity:.6">（ドロップダウンで上書き / ★=自動推定から変更済）</span></div>
+    <div id="word-detail">${renderWordTable(wd,it.id,a)}</div>
+  </div>
+  <div class="card">
+    <div class="card-title">依存構造図 比較</div>
+    <div style="display:flex;gap:2px;margin-bottom:8px">
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;padding:2px 8px;border-radius:3px;background:var(--red-dim);color:var(--red);border:1px solid rgba(217,95,95,.2)">UDJ 原文</span>
+      <span style="font-family:'IBM Plex Mono',monospace;font-size:.65rem;padding:2px 8px;border-radius:3px;background:var(--blu-dim);color:var(--blu);border:1px solid rgba(91,155,213,.2)">UDJ v2</span>
+    </div>
+    <div class="arc-box" id="arc-gold"><button class="arc-copy-btn" onclick="copySvgAsImage('arc-gold')">📋 copy</button>${arcSvg(goldArc(it.id),"UDJ 原文 (SUW)","#d95f5f")}</div>
+    <div style="border-top:1px dashed var(--bd);margin:4px 0"></div>
+    ${hasDeepPhon(a)?`<div style="font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:#9b59b6;margin:4px 0 2px;padding:3px 8px;background:rgba(155,89,182,.06);border-radius:3px;border:1px solid rgba(155,89,182,.15)">表層: ${esc(a.phon)}</div>`:''}
+    <div class="arc-box" id="arc-v2"><button class="arc-copy-btn" onclick="copySvgAsImage('arc-v2')">📋 copy</button>${arcSvg(v2Arc,"UDJ v2","#5b9bd5")}</div>
+    <div id="ud-val">${renderAlerts(validateUD(wd))}</div>
+  </div>
+  <details class="card" style="cursor:pointer">
+    <summary class="card-title" style="cursor:pointer;user-select:none">📖 グロス→feats リファレンス <span style="font-weight:400;opacity:.5">（クリックで展開）</span></summary>
+    <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--acc);font-weight:600;margin-bottom:4px">VerbForm（活用形カテゴリ）</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--fg2);line-height:1.8">
+          <b style="color:var(--grn)">Conv</b> = 副動詞的接続形のみ<br>
+          　de（きれい<b>で</b>安い）COP.GER<br>
+          　ni（きれい<b>に</b>飾る）COP.ADV<br>
+          　te（食べ<b>て</b>帰る）GER<br>
+          <b style="color:var(--grn)">Part</b> = 連体形（名詞修飾）<br>
+          　na（きれい<b>な</b>花）COP.ADN<br>
+          <b style="color:var(--grn)">Fin</b> = 定形（主節述語）<br>
+          <b style="color:var(--grn)">Inf</b> = 不定形<br>
+        </div>
+      </div>
+      <div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--acc);font-weight:600;margin-bottom:4px">Mood（条件・推量はこちら）</div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--fg2);line-height:1.8">
+          <b style="color:var(--blu)">Cnd</b> = 条件（≠Conv）<br>
+          　nara（きれい<b>なら</b>）COP.COND<br>
+          　tara（食べ<b>たら</b>）PST.COND<br>
+          　ba（食べれ<b>ば</b>）COND<br>
+          <b style="color:var(--blu)">Cjc</b> ⚡ = 推量<br>
+          　daroo（きれい<b>だろう</b>）COP.CJC<br>
+          <b style="color:var(--blu)">Opt</b> = 意志<br>
+          <b style="color:var(--blu)">Des</b> = 希望<br>
+          <b style="color:var(--blu)">Pot</b> = 可能<br>
+          <b style="color:var(--blu)">Imp</b> = 命令<br>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:10px;border-top:1px solid var(--bd);padding-top:8px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--acc);font-weight:600;margin-bottom:4px">NEG/COP パラダイム比較（語幹特性 + 活用語尾）</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--fg2);line-height:1.8;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div>
+          <b style="color:var(--acc)">COP だ系:</b><br>
+          da = COP-PRS → <span style="color:var(--grn)">Tense=Pres</span><br>
+          daQ-ta = COP-PST → <span style="color:var(--grn)">Tense=Past</span><br>
+          daro-u = COP-CJC → <span style="color:var(--grn)">Mood=Cjc</span><br>
+          na = COP.ADN → <span style="color:var(--grn)">VerbForm=Part</span><br>
+          nara = COP.COND → <span style="color:var(--grn)">Mood=Cnd</span><br>
+          de = COP.GER → <span style="color:var(--grn)">VerbForm=Conv</span><br>
+          ni = COP.ADV → <span style="color:var(--grn)">VerbForm=Conv</span><br>
+        </div>
+        <div>
+          <b style="color:var(--red)">NEG ない系:</b><br>
+          na-i = NEG-PRS → <span style="color:var(--grn)">Pol=Neg|Tense=Pres</span><br>
+          na-kaQ-ta = NEG-PST → <span style="color:var(--grn)">Pol=Neg|Tense=Past</span><br>
+          na-kereba = NEG-COND → <span style="color:var(--grn)">Pol=Neg|Mood=Cnd</span><br>
+          na-ku-te = NEG-GER → <span style="color:var(--grn)">Pol=Neg|VF=Conv</span><br>
+          na-i-de = NEG-PRS-GER → <span style="color:var(--grn)">Pol=Neg|T=Pres|VF=Conv</span><br>
+        </div>
+      </div>
+      <div style="margin-top:6px;font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:var(--fg3)">
+        原則: 語幹(da-/na-)が語彙カテゴリ(COP/NEG)を担い、活用語尾(-i/-ta/-roo等)がTense/Mood/VerbFormを担う。一語に共存。
+      </div>
+    </div>
+    <div style="margin-top:10px;border-top:1px solid var(--bd);padding-top:8px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--acc);font-weight:600;margin-bottom:4px">依存構造: COP否定 (v2)</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--fg2);line-height:1.8">
+        きれいではない: kiree <span style="color:var(--blu)">de</span> wa <span style="color:var(--red)">na-i</span><br>
+        　kiree ←<span style="color:var(--blu)">cop</span>── de ←<span style="color:var(--grn)">case</span>── wa<br>
+        　　　　　　　 de ←<span style="color:var(--red)">aux</span>── na-i<br>
+        <span style="color:var(--fg3)">copは常にだ系(de)が担い、ない系はauxとしてcopに従属</span>
+      </div>
+    </div>
+    <div style="margin-top:10px;border-top:1px solid var(--bd);padding-top:8px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--acc);font-weight:600;margin-bottom:4px">個別グロス → feats 早見表</div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:var(--fg2);line-height:1.7;column-count:3;column-gap:16px">
+        PRS → Tense=Pres<br>
+        PST → Tense=Past<br>
+        NEG → Polarity=Neg<br>
+        POL → Polite=Form<br>
+        PASS → Voice=Pass<br>
+        CAUS → Voice=Cau<br>
+        PROG → Aspect=Prog<br>
+        PERF → Aspect=Perf<br>
+        EVID → Evident=Nfh<br>
+        COL → Style=Coll<br>
+        TOP → (case) <br>
+        NOM/ACC/DAT/GEN → Case=*<br>
+      </div>
+    </div>
+    <div style="margin-top:8px;padding:6px 10px;background:var(--bg);border-radius:var(--r);font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:var(--fg3);line-height:1.7">
+      <b style="color:var(--pink)">設計原則:</b> Conv=副詞的接続形（て/で/に）、Cnd=条件（なら/たら/ば）。条件はConvではない（トルコ語UD準拠）。<br>
+      <b style="color:var(--pink)">⚡拡張:</b> Mood=Cjc（推量）はUDコアにないが、言語固有拡張として定義。
+    </div>
+  </details>
+  <div class="nav-row">
+    <button class="nav-btn" onclick="navPrev()" ${S.idx===0?"disabled":""}>← 前</button>
+    <button class="nav-btn done-btn" onclick="toggleDone()">${a.done?"✓ 完了済":"○ 完了にする"}</button>
+    <button class="nav-btn" onclick="navNext()" ${S.idx>=its.length-1?"disabled":""}>次 →</button></div>`;
+}
+
+function renderWordTable(wd,itemId,a){
+  if(!wd.length)return'<div style="color:var(--fg3);font-size:.75rem">音韻表記を入力してください</div>';
+  let h=`<table class="wt"><thead><tr><th>#</th><th>phon</th><th>gloss</th><th>UPOS</th><th>ExtPOS</th><th>deprel</th><th>head</th><th>feats</th></tr></thead><tbody>`;
+  wd.forEach((w,i)=>{
+    const uSel=UPOS_LIST.map(u=>`<option value="${u}" ${w.upos===u?"selected":""}>${u}</option>`).join("");
+    const dSel=DEPREL_LIST.map(d=>`<option value="${d}" ${w.deprel===d?"selected":""}>${d}</option>`).join("");
+    const hOpts=["0:root",...wd.map((ww,j)=>j===i?null:`${j+1}:${ww.phon}`).filter(Boolean)];
+    const hSel=hOpts.map(o=>{const v=parseInt(o);return`<option value="${v}" ${w.head===v?"selected":""}>${o}</option>`}).join("");
+    const fTags=w.feats.map((f,fi)=>{
+      const isOv=w.hasOvFeats;const isCustom=CUSTOM_FEATS.has(f);
+      const cls=isCustom?'over':(isOv?'over':'auto');
+      return`<span class="ftag ${cls}">${f}${isCustom?' ⚡':''}<span class="x" onclick="removeFeat(${i},${fi})">×</span></span>`;
+    }).join("");
+    h+=`<tr>
+      <td class="widx">${i+1}</td><td class="wphon">${w.phon}</td><td class="wgloss">${w.gloss}</td>
+      <td><select class="${w.hasOvUpos?'overridden':''}" onchange="setOv(${i},'upos',this.value)">${`<option value="">—</option>`+uSel}</select></td>
+      <td><select class="${w.hasExtpos?'overridden extpos-set':''}" onchange="setOv(${i},'extpos',this.value)">${`<option value="">—</option>`+UPOS_LIST.map(u=>`<option value="${u}" ${w.extpos===u?"selected":""}>${u}</option>`).join("")}</select></td>
+      <td><select class="${w.hasOvDeprel?'overridden':''}" onchange="setOv(${i},'deprel',this.value)">${`<option value="">—</option>`+dSel}</select></td>
+      <td><select class="${w.hasOvHead?'overridden':''}" onchange="setOv(${i},'head',+this.value)">${hSel}</select></td>
+      <td><div class="ftags">${fTags}<button class="feat-add" onclick="S.modal={type:'feat',wi:${i}};render()">+</button></div></td>
+    </tr>`;
+  });
+  h+=`</tbody></table>`;return h;
+}
+
+function renderSummary(its){
+  const rows=its.map((it,i)=>{const a=S.ann[it.id]||{};const wd=wordData(a);
+    const fs=wd.flatMap(w=>w.feats);const ufs=[...new Set(fs)].join(", ");
+    return`<tr><td>${(a.done?'<span style="color:var(--grn)">✓</span>':'<span style="color:var(--fg3)">○</span>')}</td>
+      <td><span class="jump" onclick="S.view='annotate';S.idx=${i};render()">#${i+1}</span></td>
+      <td>${it.example}${it.ctx?` <span style="background:var(--acc);color:#000;font-size:.55rem;padding:0 4px;border-radius:6px">${it.ctx.sid||it.ctx}</span>`:""}</td><td style="color:var(--fg3);font-size:.65rem">${it.suw.join("+")}</td>
+      <td style="color:var(--acc)">${a.phon||"—"}${a.phon_deep?` <span style="color:#d29922;font-size:.55rem">⇄基底</span>`:""}</td><td style="color:var(--fg2)">${a.gloss||"—"}</td>
+      <td style="color:var(--grn);font-size:.65rem">${ufs||"—"}</td></tr>`}).join("");
+  return`<div class="card"><div class="card-title">${BATCHES[S.batch].label}</div>
+    <table class="sum-table"><thead><tr><th></th><th>#</th><th>例文</th><th>SUW</th><th>phon</th><th>gloss</th><th>feats</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function renderModal(){
+  if(!S.modal)return"";
+  if(S.modal.type==="feat"){
+    const it=cur(),a=ann(it.id),wd=wordData(a),w=wd[S.modal.wi];
+    const current=w?w.feats:[];
+    const q=(S.modal.q||"").toLowerCase();
+    // Track collapsed categories
+    if(!S.modal.collapsed)S.modal.collapsed={};
+    let html=`<div class="feat-modal-bg" onclick="if(event.target===this){S.modal=null;render()}">
+      <div class="feat-modal"><h3>Feats: ${w?w.phon:""} (#${S.modal.wi+1})</h3>
+      <input class="feat-search" placeholder="検索フィルタ (例: Mood, Cnd, Past...)" value="${S.modal.q||""}" oninput="S.modal.q=this.value;render();this.focus()" id="feat-search-input">`;
+    // Selected feats summary
+    if(current.length){
+      html+=`<div style="margin-bottom:6px;padding:4px 6px;background:var(--bg);border-radius:3px;font-size:.62rem;color:var(--grn);font-family:'IBM Plex Mono',monospace">
+        選択中: ${current.map(f=>`<span style="cursor:pointer;text-decoration:underline dotted" onclick="toggleFeat(${S.modal.wi},'${f}')">${f} ✕</span>`).join(" | ")}</div>`;
+    }
+    // Render grouped categories
+    for(const[cat,feats] of Object.entries(UD_FEATS_GROUPED)){
+      const isCollapsed=S.modal.collapsed[cat];
+      // Check if any feat in this category matches search
+      let catHasMatch=false;
+      let catBody="";
+      for(const[feat,vals] of Object.entries(feats)){
+        const matchingVals=vals.filter(v=>{
+          if(v==="_CUSTOM_")return !q;
+          const fv=feat+"="+v;
+          return !q||fv.toLowerCase().includes(q)||feat.toLowerCase().includes(q)||v.toLowerCase().includes(q);
+        });
+        if(matchingVals.length===0)continue;
+        catHasMatch=true;
+        catBody+=`<div class="feat-grp-label">${feat}</div>`;
+        matchingVals.forEach(v=>{
+          if(v==="_CUSTOM_"){
+            catBody+=`<div style="width:100%;font-size:.6rem;color:var(--fg3);padding:2px 6px">（カスタム値: 下部入力欄から追加）</div>`;
+            return;
+          }
+          const fv=feat+"="+v;
+          const sel=current.includes(fv);
+          const isCustom=CUSTOM_FEATS.has(fv);
+          catBody+=`<div class="feat-opt ${sel?'selected':''} ${isCustom?'custom-ext':''}" onclick="toggleFeat(${S.modal.wi},'${fv}')">${v}${isCustom?' ⚡':''}${sel?' ✓':''}</div>`;
+        });
+      }
+      if(!catHasMatch)continue;
+      html+=`<div class="feat-cat">
+        <div class="feat-cat-hdr ${isCollapsed&&!q?'collapsed':''}" onclick="S.modal.collapsed['${cat}']=!S.modal.collapsed['${cat}'];render()">
+          <span>${cat}</span><span class="arrow">▼</span></div>
+        <div class="feat-cat-body ${isCollapsed&&!q?'hidden':''}">${catBody}</div></div>`;
+    }
+    // Custom feat input
+    html+=`<div class="feat-custom-row">
+      <input id="custom-feat-input" placeholder="Feature=Value (例: InflClass=Godan)" onkeydown="if(event.key==='Enter')addCustomFeat(${S.modal.wi})">
+      <button onclick="addCustomFeat(${S.modal.wi})">追加</button></div>`;
+    html+=`<button class="close-btn" onclick="S.modal=null;render()">閉じる</button></div></div>`;
+    return html;
+  }
+  return"";
+}
+function addCustomFeat(wi){
+  const inp=document.getElementById("custom-feat-input");
+  if(!inp)return;
+  const v=inp.value.trim();
+  if(!v||!v.includes("="))return;
+  CUSTOM_FEATS.add(v);
+  if(!UD_FEATS.includes(v))UD_FEATS.push(v);
+  toggleFeat(wi,v);
+}
+
+// ═══════════════════════════════════
+// ACTIONS
+// ═══════════════════════════════════
+function updField(f,v){const a=ann(cur().id);a[f]=v;clearTimeout(updField._t);updField._t=setTimeout(()=>updPreview(),200)}
+function updPreview(){
+  const el=document.getElementById("word-detail");if(el){const a=ann(cur().id);el.innerHTML=renderWordTable(wordData(a),cur().id,a)}
+  const arcEl=document.getElementById("arc-v2");
+  if(arcEl){const a=ann(cur().id);const wd=wordData(a);
+    const v2Arc=wd.map(w=>({text:w.phon,upos:w.upos,extpos:w.extpos,deprel:w.deprel,head:w.head,feats:w.feats}));
+    arcEl.innerHTML='<button class="arc-copy-btn" onclick="copySvgAsImage(\'arc-v2\')">📋 copy</button>'+arcSvg(v2Arc,"UDJ v2","#5b9bd5");}
+  const valEl=document.getElementById("ud-val");
+  if(valEl){const a=ann(cur().id);valEl.innerHTML=renderAlerts(validateUD(wordData(a)));}
+}
+function setOv(wi,field,val){
+  const a=ann(cur().id);if(!a.ov[wi])a.ov[wi]={};
+  if(field==="head")a.ov[wi][field]=val;
+  else a.ov[wi][field]=val||undefined;
+  // If setting upos, also re-derive deprel
+  if(field==="upos"){const gs=v2glosses(a);const g=gs[wi]||"";const ad=autoDeprel(g,val);if(!a.ov[wi].deprel)a.ov[wi].deprel=undefined;}
+  render();
+}
+function removeFeat(wi,fi){
+  const a=ann(cur().id);if(!a.ov[wi])a.ov[wi]={};
+  const wd=wordData(a),w=wd[wi];
+  const newF=[...w.feats];newF.splice(fi,1);
+  a.ov[wi].feats=newF;render();
+}
+function toggleFeat(wi,feat){
+  const a=ann(cur().id);if(!a.ov[wi])a.ov[wi]={};
+  const wd=wordData(a),w=wd[wi];
+  let newF=[...(a.ov[wi].feats||w.autoFeats||[])];
+  const idx=newF.indexOf(feat);
+  if(idx>=0)newF.splice(idx,1);else newF.push(feat);
+  newF.sort();a.ov[wi].feats=newF;render();
+}
+function toggleDone(){const a=ann(cur().id);a.done=!a.done;render()}
+function navPrev(){if(S.idx>0){S.idx--;render()}}
+function navNext(){if(S.idx<items().length-1){S.idx++;render()}}
+function esc(s){return(s||"").replace(/"/g,"&quot;").replace(/</g,"&lt;")}
+document.addEventListener("keydown",e=>{if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA"||e.target.tagName==="SELECT")return;
+  if(e.key==="ArrowLeft")navPrev();else if(e.key==="ArrowRight")navNext();else if(e.key==="d")toggleDone()});
+render();
+</script>
+
+
+</body></html>
