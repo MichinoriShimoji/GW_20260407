@@ -86,8 +86,16 @@ tr:nth-child(even) td{background:rgba(0,0,0,.015)}
   .slide{transform:scale(calc(100vh / 720))}
 }
 
-/* Top bar for content slides */
-.topbar{height:4px;background:var(--acc);margin:-56px -72px 24px -72px;width:calc(100% + 144px);flex-shrink:0}
+/* Section nav bar */
+.secnav{
+  display:flex;gap:0;margin:-56px -72px 16px -72px;width:calc(100% + 144px);flex-shrink:0;
+  background:var(--bg2);border-bottom:1px solid var(--bd);padding:0 48px;font-size:13px;
+}
+.secnav span{
+  padding:9px 14px;color:var(--fg3);font-weight:500;white-space:nowrap;
+  border-bottom:3px solid transparent;
+}
+.secnav span.active{color:var(--acc2);border-bottom-color:var(--acc);font-weight:600}
 
 /* Card callout (GUIDELINE style) */
 .callout{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:20px 24px;margin:16px 0;box-shadow:0 1px 3px rgba(0,0,0,.04);border-left:4px solid var(--acc)}
@@ -118,23 +126,8 @@ tr:nth-child(even) td{background:rgba(0,0,0,.015)}
   <div class="date">2026.04.07</div>
 </div>
 
-<!-- ===== 2. 発表の流れ ===== -->
-<div class="slide">
-  <div class="topbar"></div>
-  <h2>発表の流れ</h2>
-  <ol style="font-size:24px;line-height:2.2;margin-top:16px">
-    <li>背景：Universal Dependencies（UD）とは</li>
-    <li>UD Japanese（UDJ）の 3 つの根本的問題</li>
-    <li>先行研究（Taguchi & Chiang 2023）と問題点</li>
-    <li>提案：MUDJ と Matomonizer パイプライン</li>
-    <li>他の日琉諸語への展開</li>
-    <li>まとめ</li>
-  </ol>
-</div>
-
-<!-- ===== 3. UD とは ===== -->
-<div class="slide">
-  <div class="topbar"></div>
+<!-- ===== 2. UD とは ===== -->
+<div class="slide" data-sec="背景">
   <h2>Universal Dependencies（UD）とは</h2>
   <div class="cols">
     <div class="col">
@@ -155,9 +148,8 @@ tr:nth-child(even) td{background:rgba(0,0,0,.015)}
   </div>
 </div>
 
-<!-- ===== 4. 問題の概要 ===== -->
-<div class="slide">
-  <div class="topbar"></div>
+<!-- ===== 3. 問題の概要 ===== -->
+<div class="slide" data-sec="UDJの問題">
   <h2>UDJ の 3 つの根本的問題</h2>
   <p>UDJ は<span class="red">学校文法（GB）</span>に基づく仮名ベースの分析を採用<br>
   <span class="arrow">→</span> UD の「語ベース」原則と根本的に矛盾</p>
@@ -172,9 +164,8 @@ tr:nth-child(even) td{background:rgba(0,0,0,.015)}
   <p style="margin-top:20px">以下、<em>takaku nakatta</em>（高くなかった）で全問題を図示する</p>
 </div>
 
-<!-- ===== 5. 問題1 ===== -->
-<div class="slide">
-  <div class="topbar"></div>
+<!-- ===== 4. 問題1 ===== -->
+<div class="slide" data-sec="UDJの問題">
   <h2><span class="tag problem">問題 1</span> トークン化</h2>
   <div class="fig" style="flex:1">
     <img src="udj_p1_tokenization.png" alt="Tokenization problem">
@@ -182,9 +173,8 @@ tr:nth-child(even) td{background:rgba(0,0,0,.015)}
   <p style="text-align:center">UDJ：形態素 3 トークン（高く・なかっ・た）<span class="arrow"> → </span>MUDJ：語 2 トークン（taka-ku・na-kaQta）</p>
 </div>
 
-<!-- ===== 6. 問題2 ===== -->
-<div class="slide">
-  <div class="topbar"></div>
+<!-- ===== 5. 問題2 ===== -->
+<div class="slide" data-sec="UDJの問題">
   <h2><span class="tag problem">問題 2</span> FEATS（形態論的特徴）の欠如</h2>
   <div class="fig" style="flex:1">
     <img src="udj_p2_feats.png" alt="FEATS problem">
@@ -192,9 +182,8 @@ tr:nth-child(even) td{background:rgba(0,0,0,.015)}
   <p style="text-align:center">UDJ では FEATS ≈ 0% <span class="arrow">→</span> 日本語が<span class="red">「孤立語」</span>に見える致命的な問題</p>
 </div>
 
-<!-- ===== 7. 問題3 ===== -->
-<div class="slide">
-  <div class="topbar"></div>
+<!-- ===== 6. 問題3 ===== -->
+<div class="slide" data-sec="UDJの問題">
   <h2><span class="tag problem">問題 3</span> DepRel の不適切な仕様</h2>
   <div class="fig" style="flex:1">
     <img src="udj_p3_deprel.png" alt="DepRel problem">
@@ -202,9 +191,8 @@ tr:nth-child(even) td{background:rgba(0,0,0,.015)}
   <p style="text-align:center">UDJ：cop / advmod / aux を全て <code>aux</code> に <span class="arrow">→</span> 英語との対比が不可能</p>
 </div>
 
-<!-- ===== 8. 先行研究：成果 ===== -->
-<div class="slide">
-  <div class="topbar"></div>
+<!-- ===== 7. 先行研究：成果 ===== -->
+<div class="slide" data-sec="先行研究">
   <h2><span class="tag prior">先行研究</span> Taguchi & Chiang (2023) の成果</h2>
   <div class="cols" style="margin-top:8px">
     <div class="col">
@@ -228,9 +216,8 @@ tr:nth-child(even) td{background:rgba(0,0,0,.015)}
   </div>
 </div>
 
-<!-- ===== 9. 先行研究：アルゴリズムと問題点 ===== -->
-<div class="slide">
-  <div class="topbar"></div>
+<!-- ===== 8. 先行研究：アルゴリズムと問題点 ===== -->
+<div class="slide" data-sec="先行研究">
   <h2><span class="tag prior">先行研究</span> アルゴリズムと問題点</h2>
   <div class="fig" style="flex:1">
     <img src="taguchi_code.png" alt="Taguchi merger algorithm code">
@@ -244,9 +231,8 @@ tr:nth-child(even) td{background:rgba(0,0,0,.015)}
   </div>
 </div>
 
-<!-- ===== 10. 先行研究：比較 ===== -->
-<div class="slide">
-  <div class="topbar"></div>
+<!-- ===== 9. 先行研究：比較 ===== -->
+<div class="slide" data-sec="先行研究">
   <h2><span class="tag prior">比較</span> GSD / Taguchi / MUDJ</h2>
   <div class="fig" style="flex:1">
     <img src="taguchiandmine.png" alt="Taguchi vs MUDJ comparison">
@@ -255,8 +241,7 @@ tr:nth-child(even) td{background:rgba(0,0,0,.015)}
 </div>
 
 <!-- ===== 10. MUDJ 方針 ===== -->
-<div class="slide">
-  <div class="topbar"></div>
+<div class="slide" data-sec="MUDJ">
   <h2><span class="tag solution">提案</span> MUDJ の基本方針</h2>
   <p><span class="grn">GB の語分割を完全に放棄</span>し、言語学的に妥当な語ベースの分割に自動変換</p>
   <h3 style="margin-top:16px">Matomonizer パイプライン（5 フェーズ）</h3>
@@ -272,8 +257,7 @@ tr:nth-child(even) td{background:rgba(0,0,0,.015)}
 </div>
 
 <!-- ===== 11. 結果 ===== -->
-<div class="slide">
-  <div class="topbar"></div>
+<div class="slide" data-sec="MUDJ">
   <h2><span class="tag solution">結果</span> GSD 変換の成果</h2>
   <table style="margin-top:12px">
     <tr><th></th><th>GSD トークン数</th><th>GSD Feats</th><th>M-UDJ トークン数</th><th>Gloss</th><th>Feats</th></tr>
@@ -290,8 +274,7 @@ tr:nth-child(even) td{background:rgba(0,0,0,.015)}
 </div>
 
 <!-- ===== 12. 全体像 ===== -->
-<div class="slide">
-  <div class="topbar"></div>
+<div class="slide" data-sec="展開">
   <h2>プロジェクトの全体像</h2>
   <div class="fig" style="flex:1">
     <img src="udj_panel.png" alt="Project pipeline overview">
@@ -300,8 +283,7 @@ tr:nth-child(even) td{background:rgba(0,0,0,.015)}
 </div>
 
 <!-- ===== 13. 伊良部 ===== -->
-<div class="slide">
-  <div class="topbar"></div>
+<div class="slide" data-sec="展開">
   <h2>宮古語伊良部方言への応用</h2>
   <div class="cols">
     <div class="col">
@@ -322,8 +304,7 @@ tr:nth-child(even) td{background:rgba(0,0,0,.015)}
 </div>
 
 <!-- ===== 14. 現状と今後 ===== -->
-<div class="slide">
-  <div class="topbar"></div>
+<div class="slide" data-sec="まとめ">
   <h2>現状と今後の課題</h2>
   <div class="callout red" style="margin-top:8px">
     <p style="font-size:20px;color:var(--fg);margin:0"><strong>現時点は試行錯誤の段階であり、かなり不完全</strong></p>
@@ -342,8 +323,7 @@ tr:nth-child(even) td{background:rgba(0,0,0,.015)}
 </div>
 
 <!-- ===== 15. まとめ ===== -->
-<div class="slide">
-  <div class="topbar"></div>
+<div class="slide" data-sec="まとめ">
   <h2>まとめ</h2>
   <ol style="font-size:22px;line-height:2">
     <li>UDJ は<strong>3 つの根本的問題</strong>を抱える<br>
@@ -365,17 +345,33 @@ tr:nth-child(even) td{background:rgba(0,0,0,.015)}
 <div class="nav-hint" id="navHint">← → キーまたはクリックで移動</div>
 
 <script>
+const SECTIONS=['背景','UDJの問題','先行研究','MUDJ','展開','まとめ'];
 const slides=document.querySelectorAll('.slide');
 let cur=0;
+
+function buildNav(slide){
+  if(slide.classList.contains('title'))return;
+  const sec=slide.dataset.sec||'';
+  if(slide.querySelector('.secnav'))return;
+  const nav=document.createElement('div');
+  nav.className='secnav';
+  SECTIONS.forEach(s=>{
+    const sp=document.createElement('span');
+    sp.textContent=s;
+    if(s===sec)sp.className='active';
+    nav.appendChild(sp);
+  });
+  slide.insertBefore(nav,slide.firstChild);
+}
+
+slides.forEach(s=>buildNav(s));
+
 function go(n){
   if(n<0||n>=slides.length)return;
   slides[cur].classList.remove('active');
   cur=n;
   slides[cur].classList.add('active');
   document.getElementById('progress').style.width=((cur+1)/slides.length*100)+'%';
-  slides[cur].querySelector('.slide-num')||insertNum();
-}
-function insertNum(){
   let el=slides[cur].querySelector('.slide-num');
   if(!el){el=document.createElement('div');el.className='slide-num';slides[cur].appendChild(el)}
   el.textContent=(cur+1)+' / '+slides.length;
