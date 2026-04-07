@@ -232,23 +232,15 @@ tr:nth-child(even) td{background:rgba(0,0,0,.015)}
 <div class="slide">
   <div class="topbar"></div>
   <h2><span class="tag prior">先行研究</span> アルゴリズムと問題点</h2>
-  <div class="cols">
-    <div class="col">
-      <p style="font-size:18px">助動詞を検出して先行トークンに単純マージするアルゴリズム：</p>
-      <div style="margin:12px 0;padding:14px 18px;background:var(--bg2);border-radius:8px;font-size:17px;line-height:1.7">
-        <p style="margin:0;font-size:17px">「いらっしゃら＋なかっ＋た」(3語)<br><span class="arrow">→</span> <em>irassyara-nakat-ta</em> (1語) <span class="grn">OK</span></p>
-        <p style="margin:10px 0 0;font-size:17px">「高く＋なかっ＋た」(3語)<br><span class="arrow">→</span> <span class="red">*takakunakatta</span> (1語) <span class="red">NG</span></p>
-      </div>
-      <p style="font-size:17px"><strong>問題：</strong>先行トークンが<span class="red">束縛形態素</span>か<span class="grn">自立語</span>かを区別しない</p>
-      <ul style="font-size:17px;line-height:1.6">
-        <li>高く は完全な語 → /takaku/ + /nakatta/ の 2 語が正解</li>
-        <li>形態的複雑さが<span class="red">過大評価されがち</span></li>
-        <li>/takaku/ と /nakatta/ 間の <code>aux</code> 関係が消失</li>
-      </ul>
+  <div class="fig" style="flex:1">
+    <img src="taguchi_code.png" alt="Taguchi merger algorithm code">
+  </div>
+  <div style="display:flex;gap:24px;margin-top:8px;align-items:baseline">
+    <div style="font-size:16px;flex:1;padding:8px 12px;background:var(--bg2);border-radius:6px;line-height:1.6">
+      いらっしゃら＋なかっ＋た → <em>irassyara-nakat-ta</em> (1語) <span class="grn">OK</span><br>
+      高く＋なかっ＋た → <span class="red">*takakunakatta</span> (1語) <span class="red">NG</span>（正：2語）
     </div>
-    <div class="col fig">
-      <img src="taguchi_code.png" alt="Taguchi merger algorithm code">
-    </div>
+    <p style="font-size:16px;flex:0.6;margin:0"><strong>問題：</strong><span class="red">束縛形態素</span>か<span class="grn">自立語</span>かを区別せず、形態的複雑さが<span class="red">過大評価されがち</span></p>
   </div>
 </div>
 
